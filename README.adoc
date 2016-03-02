@@ -1,0 +1,108 @@
+= kafka-rest-atmosphere
+
+This application is based on kafka-rest (2.0.0) and use atmosphere (2.4.3) to add a websocket based 
+transport to kafka-rest's API. As a result, the provided services can be invoked over either HTTP or Websocket.
+
+The advantage of using Websocket is its support of asynchronous duplex communication. Messages can be
+posted and received asynchronously. This particular application enables kafka-rest's REST services to be invoked
+over Websocket using atmpsphere. In addition, this application adds additional consumer services that utilize Websocket
+to transport messages continuously over the socket.
+
+== Using Websocket
+
+=== Connecting
+
+Use your websocket client to connect to ws://localhost:8082
+For example, you can you the Echo demo at http://www.websocket.org/echo.html as your client.
+
+
+=== Invoking operations
+
+Any of the REST operations that are supported by kafka-rest may be invoked over HTTP or Websocket.
+When invoking an operation over Websocket, the message must be serialized in the Websocket binding
+format that use the following JSON format.
+
+--------------------------------------
+   {"id": "<identifier>", "method": "<method>", "path": "<path>", 
+    "type": "<type_header>", "accept": "<accept_header>",
+    "data": <content>}
+--------------------------------------
+
+where <identifier> represents an identifier to correlate the response to its original request,
+<method> represents the request method, <path> represents the request path, <type_header> and <accept_header>
+represent the optional content-type and accept headers, and <content> represents the optinal content entity.
+
+For example, an HTTP request to list topics
+
+--------------------------------------
+   GET /topics HTTP/1.1
+   Host: localhost:8082
+   Accept: */*
+
+--------------------------------------
+
+will correspond to a JSON message of
+
+--------------------------------------
+   {"id": "...", "method": "GET", "path": "/topics"}
+--------------------------------------
+
+Similarly, an HTTP request to publish a message "Kafka" to topic "test"
+
+--------------------------------------
+    POST /topics/test HTTP/1.1
+    Host: localhost:8082
+    Accept: */*
+    Content-Type: application/vnd.kafka.binary.v1+json
+    Content-Length: 34
+    
+    {"records":[{"value":"S2Fma2E="}]}
+
+--------------------------------------
+
+will correspond to a JSON message of
+
+--------------------------------------
+    {"id": "...", "method": "POST", "path": "/topics/test", 
+     "type": "application/vnd.kafka.binary.v1+json",
+     "data": {"records":[{"value":"S2Fma2E="}]}}
+--------------------------------------
+
+For details and more samples, refer to kafka-rest-websocket-binding [1]. For available operations, 
+refer to the kafka-rest documentation [2]
+
+
+=== Additional operations supported for Websocket
+
+Addtional operations are specifically included for the Websocket binding to allow a consumer to subscribe
+to a topic and get messages pushed asynchronously over Websocket.
+
+To subscribe to a Binary topic
+
+--------------------------------------
+    {"id": "...", "method": "GET", 
+     "path": "/ws/consumers/<consumer_group>/instances/<instance_name>/topics/<topic>", 
+     "accept": "application/vnd.kafka.binary.v1+json"}
+--------------------------------------
+
+To subscribe to a JSON topic
+
+--------------------------------------
+    {"id": "...", "method": "GET", 
+     "path": "/ws/consumers/<consumer_group>/instances/<instance_name>/topics/<topic>", 
+     "accept": "application/vnd.kafka.json.v1+json"}
+--------------------------------------
+
+To unsubscribe the topic
+
+--------------------------------------
+    {"id": "...", "method": "DELETE", 
+     "path": "/ws/consumers/<consumer_group>/instances/<instance_name>/topics/<topic>"}
+--------------------------------------
+
+
+=== References
+
+- [1] kafka-rest-websocket-binding.adoc
+
+- [2] http://docs.confluent.io/2.0.0/kafka-rest/docs/intro.html#produce-and-consume-binary-messages[http://docs.confluent.io/2.0.0/kafka-rest/docs/intro.html#produce-and-consume-binary-messages]
