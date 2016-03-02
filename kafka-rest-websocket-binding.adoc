@@ -1,4 +1,4 @@
-== Websocket binding for Kafka-REST
+== Websocket binding used for Kafka-REST
 
 Assume the version of the Websocket binding and the use of optional features has been negotiated during 
 the handshake phase after the socket is open. This Websocket binding is characterized by the following rules.
@@ -34,12 +34,12 @@ where
 
 
 
-In the following sections, the messages used by the websocket binding of kafka-rest operations are described.
-All the operations supported by the original kafka-rest are supported using the above websocket binding. 
-In addition to these operations, for consuming messages, there are subscribe operations that are specifically supported for the websocket binding.
+In the following sections, the messages used by the websocket binding of kafka-rest operations are described. All the operations supported by kafka-rest can be invoked over Websocket using this websocket binding.
+In addition to those operations, there are subscribe operations that are specifically included for this websocket binding.
+
+For details about all the operations supported by kafka-rest, please refer to kafka-rest's documentation [1].
 
 ==== Get the list of topics
-
 
 [caption="Format: "]
 .list
@@ -106,9 +106,9 @@ where *_topic_* is a topic name and *_base64_message_* is a base64 encoded strin
 ====
 {"id": "*_identifier_*", "method": "POST", "path": "/consumers/*_consumer_group_*", "type": "application/vnd.kafka.binary.v1+json", "data": {"id": "*_instance_name_*", "format": "binary", "auto.offset.reset": "smallest"}}
 ====
-where *_consumer_group_* is a consumer group name and *_instance_name_* is a consumer name.
+where *_consumer_group_* is a consumer group name and *_instance_name_* is a consumer instance name.
 
-.Sample Request (creating binary consumer "my_instance" in consumer group "my_consumer_group")
+.Sample Request (creating binary consumer "my_instance" at consumer group "my_consumer_group")
 ----
 {"id": "126", "method": "POST", "path": "/consumers/my_consumer_group", "type": "application/vnd.kafka.binary.v1+json",  "data": {"id": "my_instance", "format": "binary", "auto.offset.reset": "smallest"}}
 ----
@@ -125,9 +125,9 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
 ====
 {"id": "*_identifier_*", "method": "GET", "path": "/ws/consumers/*_consumer_group_*/instances/*_instance_name_*/topics/*_topic_*", "accept": "application/vnd.kafka.binary.v1+json"}
 ====
-where *_consumer_group_* is a consumer group name, *_instance_name_* is a consumer name, and *_topic_* is a topic name.
+where *_consumer_group_* is a consumer group name, *_instance_name_* is a consumer instance name, and *_topic_* is a topic name.
 
-.Sample Request (subscribing binary topic "test" by consumer "my_instance" in consumer group "my_consumer_group")
+.Sample Request (subscribing to binary topic "test" by consumer "my_instance" at consumer group "my_consumer_group")
 ----
 {"id": "127", "method": "GET", "path": "/ws/consumers/my_consumer_group/instances/my_instance/topics/test", "accept": "application/vnd.kafka.binary.v1+json"}
 ----
@@ -146,9 +146,9 @@ where *_consumer_group_* is a consumer group name, *_instance_name_* is a consum
 ====
 {"id": "*_identifier_*", "method": "DELETE", "path": "/ws/consumers/*_consumer_group_*/instances/*_instance_name_*/topics/*_topic_*"}
 ====
-where *_consumer_group_* is a consumer group name, *_instance_name_* is a consumer name, and *_topic_* is a topic name.
+where *_consumer_group_* is a consumer group name, *_instance_name_* is a consumer instance name, and *_topic_* is a topic name.
 
-.Sample Request (unsubscribing topic "test" by consumer "my_instance" in consumer group "my_consumer_group")
+.Sample Request (unsubscribing from topic "test" by consumer "my_instance" at consumer group "my_consumer_group")
 ----
 {"id": "128", "method": "DELETE", "path": "/ws/consumers/my_consumer_group/instances/my_instance/topics/test"}
 ----
@@ -160,9 +160,9 @@ where *_consumer_group_* is a consumer group name, *_instance_name_* is a consum
 ====
 {"id": "*_identifier_*", "method": "DELETE", "path": "/consumers/*_consumer_group_*/instances/*_instance_name_*"}
 ====
-where *_consumer_group_* is a consumer group name and *_instance_name_* is a consumer name
+where *_consumer_group_* is a consumer group name and *_instance_name_* is a consumer instance name
 
-.Sample Request (deleting consumer "my_instance" in consumer group "my_consumer_group")
+.Sample Request (deleting consumer "my_instance" at consumer group "my_consumer_group")
 ----
 {"id": "129", "method": "DELETE", "path": "/consumers/my_consumer_group/instances/my_instance"}
 ----
@@ -210,9 +210,9 @@ where *_topic_* is a topic name and *_json_message_* is a json encoded string re
 ====
 {"id": "*_identifier_*", "method": "POST", "path": "/consumers/*_consumer_group_*", "type": "application/vnd.kafka.json.v1+json",  "data": {"id": "*_instance_name_*", "format": "json", "auto.offset.reset": "smallest"}}
 ====
-where *_consumer_group_* is a consumer group name and *_instance_name_* is a consumer name.
+where *_consumer_group_* is a consumer group name and *_instance_name_* is a consumer instance name.
 
-.Sample Request (creating json consumer "my_json_instance" in consumer group "my_json_consumer_group")
+.Sample Request (creating json consumer "my_json_instance" at consumer group "my_json_consumer_group")
 ----
 {"id": "126", "method": "POST", "path": "/consumers/my_json_consumer_group", "type": "application/vnd.kafka.json.v1+json",  "data": {"id": "my_json_instance", "format": "json", "auto.offset.reset": "smallest"}}
 ----
@@ -229,9 +229,9 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
 ====
 {"id": "*_identifier_*", "method": "GET", "path": "/ws/consumers/*_consumer_group_*/instances/*_instance_name_*/topics/*_topic_*", "accept": "application/vnd.kafka.json.v1+json"}
 ====
-where *_consumer_group_* is a consumer group name, *_instance_name_* is a consumer name, and *_topic_* is a topic name.
+where *_consumer_group_* is a consumer group name, *_instance_name_* is a consumer instance name, and *_topic_* is a topic name.
 
-.Sample Request (subscribing json topic "jsontest" by consumer "my_json_instance" in consumer group "my_json_consumer_group")
+.Sample Request (subscribing json topic "jsontest" by consumer "my_json_instance" at consumer group "my_json_consumer_group")
 ----
 {"id": "127", "method": "GET", "path": "/ws/consumers/my_json_consumer_group/instances/my_json_instance/topics/jsontest", "accept": "application/vnd.kafka.json.v1+json"}
 ----
@@ -242,16 +242,16 @@ where *_consumer_group_* is a consumer group name, *_instance_name_* is a consum
 {"id": "127", "data": {"key":null,"value":{"greeting":"bye"},"partition":0,"offset":4}}
 ----
 
-     - 3. Unsubscribe the topic
+     - 3. Unsubscribe from the topic
 
 [caption="Format: "]
 .unsubscribeTopic
 ====
 {"id": "*_identifier_*", "method": "DELETE", "path": "/ws/consumers/*_consumer_group_*/instances/*_instance_name_*/topics/*_topic_*"}
 ====
-where *_consumer_group_* is a consumer group name, *_instance_name_* is a consumer name, and *_topic_* is a topic name.
+where *_consumer_group_* is a consumer group name, *_instance_name_* is a consumer instance name, and *_topic_* is a topic name.
 
-.Sample Request (unsubscribing topic "jsontest" by consumer "my_json_instance" in consumer group "my_json_consumer_group")
+.Sample Request (unsubscribing from topic "jsontest" by consumer "my_json_instance" at consumer group "my_json_consumer_group")
 ----
 {"id": "128", "method": "DELETE", "path": "/ws/consumers/my_json_consumer_group/instances/my_json_instance/topics/jsontest"}
 ----
@@ -264,11 +264,14 @@ where *_consumer_group_* is a consumer group name, *_instance_name_* is a consum
 ====
 {"id": "*_identifier_*", "method": "DELETE", "path": "/consumers/*_consumer_group_*/instances/*_instance_name_*"}
 ====
-where *_consumer_group_* is a consumer group name and *_instance_name_* is a consumer name.
+where *_consumer_group_* is a consumer group name and *_instance_name_* is a consumer instance name.
 
-.Sample Request (deleting consumer "my_json_instance" in consumer group "my_json_consumer_group")
+.Sample Request (deleting consumer "my_json_instance" at consumer group "my_json_consumer_group")
 ----
 {"id": "129", "method": "DELETE", "path": "/consumers/my_json_consumer_group/instances/my_json_instance"}
 ----
 
 
+==== References
+
+- [1] http://docs.confluent.io/2.0.0/kafka-rest/docs/intro.html#produce-and-consume-binary-messages[http://docs.confluent.io/2.0.0/kafka-rest/docs/intro.html#produce-and-consume-binary-messages]

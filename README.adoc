@@ -1,6 +1,6 @@
 = kafka-rest-atmosphere
 
-This application is based on kafka-rest (2.0.0) and use atmosphere (2.4.3) to add a websocket based 
+This application is based on kafka-rest (2.0.1) and use atmosphere (2.4.3) to add a websocket based 
 transport to kafka-rest's API. As a result, the provided services can be invoked over either HTTP or Websocket.
 
 The advantage of using Websocket is its support of asynchronous duplex communication. Messages can be
@@ -20,7 +20,7 @@ For example, you can you the Echo demo at http://www.websocket.org/echo.html as 
 
 Any of the REST operations that are supported by kafka-rest may be invoked over HTTP or Websocket.
 When invoking an operation over Websocket, the message must be serialized in the Websocket binding
-format that use the following JSON format.
+format using the following JSON format.
 
 --------------------------------------
    {"id": "<identifier>", "method": "<method>", "path": "<path>", 
@@ -93,7 +93,7 @@ To subscribe to a JSON topic
      "accept": "application/vnd.kafka.json.v1+json"}
 --------------------------------------
 
-To unsubscribe the topic
+To unsubscribe from the topic
 
 --------------------------------------
     {"id": "...", "method": "DELETE", 
