@@ -1,6 +1,6 @@
 = kafka-rest-atmosphere
 
-This application is based on kafka-rest (2.0.1) and use atmosphere (2.4.3) to add a websocket based 
+This application is based on kafka-rest[1] (2.0.1) and use atmosphere[2] (2.4.3) to add a websocket based 
 transport to kafka-rest's API. As a result, the provided services can be invoked over either HTTP or Websocket.
 
 The advantage of using Websocket is its support of asynchronous duplex communication. Messages can be
@@ -13,7 +13,9 @@ to transport messages continuously over the socket.
 === Connecting
 
 Use your websocket client to connect to ws://localhost:8082
-For example, you can you the Echo demo at http://www.websocket.org/echo.html as your client.
+For example, you can use the Echo demo at http://www.websocket.org/echo.html as your client and 
+connect to the server at ws://hostname:8082/ and paste the appropriate JSON messages in its 
+Message text field.
 
 
 === Invoking operations
@@ -68,8 +70,8 @@ will correspond to a JSON message of
      "data": {"records":[{"value":"S2Fma2E="}]}}
 --------------------------------------
 
-For details and more samples, refer to kafka-rest-websocket-binding [1]. For available operations, 
-refer to the kafka-rest documentation [2]
+For details and more samples, refer to kafka-rest-websocket-binding [3]. For available operations, 
+refer to the kafka-rest documentation [4]
 
 
 === Additional operations supported for Websocket
@@ -102,7 +104,10 @@ To unsubscribe from the topic
 
 
 === References
+- [1] link:https://github.com/confluentinc/kafka-rest[]
 
-- [1] kafka-rest-websocket-binding.adoc
+- [2] link:https://github.com/Atmosphere/atmosphere[]
 
-- [2] http://docs.confluent.io/2.0.0/kafka-rest/docs/intro.html#produce-and-consume-binary-messages[http://docs.confluent.io/2.0.0/kafka-rest/docs/intro.html#produce-and-consume-binary-messages]
+- [3] link:kafka-rest-websocket-binding.adoc[]
+
+- [4] link:http://docs.confluent.io/2.0.0/kafka-rest/docs/intro.html#produce-and-consume-binary-messages[]

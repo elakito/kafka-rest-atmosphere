@@ -8,7 +8,7 @@ the handshake phase after the socket is open. This Websocket binding is characte
 - Arbitrary Http headers in the request are not supported.
 - The content-type header can be optionally supplied if the content is present.
 - The accept header can be optionally supplied if the response is expected.
-- The content entity can be optionall supplied.
+- The content entity can be optionally supplied.
 - The server can periodically send a heartbeat message to the connected clients to keep the connections alive.
 
 REST over Websocket uses the following message format.
