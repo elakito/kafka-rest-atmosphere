@@ -2,6 +2,8 @@ package de.elakito.kafka.atmosphere;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +34,14 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Atmosphere interceptor to enable a simple rest-websocket binding protocol.
+ * This protocol is a simplified version of SwaggerSocket. 
+ * https://github.com/swagger-api/swaggersocket
+ * 
+ * @author elakito
+ *
+ */
 public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
   private static final Logger LOG = LoggerFactory.getLogger(SimpleRestInterceptor.class);
   private final static String REQUEST_DISPATCHED = "request.dispatched";
@@ -46,10 +56,8 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
 
   private Broadcaster heartbeat;
   private final AsyncIOInterceptor interceptor = new Interceptor();
-  private final ObjectMapper mapper;
 
   public SimpleRestInterceptor() {
-    this.mapper = new ObjectMapper();
   }
 
   @Override
@@ -72,7 +80,7 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
     AtmosphereRequest request = r.getRequest();
     if (request.getAttribute(REQUEST_DISPATCHED) == null) {
       try {
-        //TODO add LONG_POLLING handling
+        //TODO add LONG_POLLING handling?
 
         // read the message entity and dispatch a service call
         String body = IOUtils.readEntirelyAsString(r).toString();
@@ -89,9 +97,9 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
           return Action.CANCELLED;
         }
         //REVISIT find a more efficient way to read and extract the message data
-        Map<?, ?> payload = mapper.readValue(body, HashMap.class);
+        JSONEnvelopeReader jer = new JSONEnvelopeReader(new StringReader(body));
 
-        AtmosphereRequest ar = createAtmosphereRequest(request, payload);
+        AtmosphereRequest ar = createAtmosphereRequest(request, jer);
         AtmosphereResponse response = r.getResponse();
         ar.localAttributes().put(REQUEST_DISPATCHED, "true");
 
@@ -122,17 +130,16 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
                               DEFAULT_HEARTBEAT_INTERVAL, DEFAULT_HEARTBEAT_INTERVAL, TimeUnit.SECONDS);
   }
 
-  private AtmosphereRequest createAtmosphereRequest(AtmosphereRequest request, Map<?, ?> payload) {
+  private AtmosphereRequest createAtmosphereRequest(AtmosphereRequest request, JSONEnvelopeReader jer) {
     AtmosphereRequest.Builder b = new AtmosphereRequestImpl.Builder();
-    final String id = (String)payload.get("id");
+    final String id = jer.getHeader("id");
     if (id != null) {
       request.localAttributes().put(REQUEST_ID, id);
     }
-    final String method = (String)payload.get("method"); 
-    final String path = (String)payload.get("path");
-    final String type = (String)payload.get("type");
-    final String accept = (String)payload.get("accept");
-    final Object data = payload.get("data");
+    final String method = jer.getHeader("method"); 
+    final String path = jer.getHeader("path");
+    final String type = jer.getHeader("type");
+    final String accept = jer.getHeader("accept");
     b.method(method != null ? method : "GET").pathInfo(path != null ? path: "/");
     if (accept != null || type != null) {
         Map<String, String> headers = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
@@ -144,9 +151,9 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
         }
         b.headers(headers);
     }
-
+    final Reader data = jer.getReader();
     if (data != null) {
-      b.body(getBytesValue(data));
+      b.reader(data);
     }
     String requestURL = request.getRequestURL() + path.substring(request.getRequestURI().length());
     b.requestURI(path).requestURL(requestURL).request(request);
@@ -196,15 +203,4 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
       return createResponse(response, responseDraft);
     }
   }    
-
-  //REVISIT find a more efficient way to read and extract the message data
-  private byte[] getBytesValue(Object o) {
-    byte[] b = null;
-    try {
-      b = mapper.writeValueAsBytes(o);
-    } catch (IOException e) {
-      //ignore
-    }
-    return b;
-  }
 }

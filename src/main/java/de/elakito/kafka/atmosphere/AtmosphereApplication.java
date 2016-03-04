@@ -30,6 +30,11 @@ import io.confluent.rest.MetricsListener;
 import io.confluent.rest.RestConfigException;
 import io.confluent.rest.logging.Slf4jRequestLog;
 
+/**
+ * Standalone Atmosphere wrapper of KafkaApplication to use Atmosphere
+ * 
+ * @author elakito 
+ */
 public class AtmosphereApplication extends KafkaRestApplication {
   private final boolean disableAtmosphere = Boolean.getBoolean("de.elakito.kafka.atmosphere.disabled");
 

@@ -5,6 +5,11 @@ import org.slf4j.LoggerFactory;
 
 import io.confluent.kafkarest.KafkaRestConfig;
 
+/**
+ * 
+ * @author elakito
+ *
+ */
 public class Main {
   private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
