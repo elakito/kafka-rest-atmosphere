@@ -10,6 +10,7 @@ import org.atmosphere.cpr.ApplicationConfig;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereServlet;
 import org.atmosphere.handler.ReflectorServletProcessor;
+import org.atmosphere.interceptor.JavaScriptProtocol;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkTrafficServerConnector;
@@ -114,7 +115,8 @@ public class AtmosphereApplication extends KafkaRestApplication {
       AtmosphereServlet proxyServlet = new AtmosphereServlet();
       AtmosphereFramework framework = proxyServlet.framework();
       framework.addAtmosphereHandler("/*", atmosphereHandler);
-      framework.interceptor(new SimpleRestInterceptor());
+      // move the javascript protocol processor in front
+      framework.interceptor(new JavaScriptProtocol()).interceptor(new SimpleRestInterceptor());
            
       servletHolder = new ServletHolder(proxyServlet);
       servletHolder.setInitParameter(ApplicationConfig.WEBSOCKET_SUPPORT, "true");

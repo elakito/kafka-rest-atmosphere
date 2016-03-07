@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Atmosphere interceptor to enable a simple rest-websocket binding protocol.
@@ -51,12 +50,13 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
   private final static byte[] RESPONSE_TEMPLATE_TAIL = "}".getBytes();
   private final static String HEARTBEAT_BROADCASTER_NAME = "/kafka-rest.heartbeat";
   private final static String HEARTBEAT_SCHEDULED = "heatbeat.scheduled";
-  private final static String HEARTBEAT_TEMPLATE = "{\"heartbeat\": \"%x\", \"time\": %d}";
+  private final static String HEARTBEAT_TEMPLATE = "{\"heartbeat\": \"%s\", \"time\": %d}";
   private final static long DEFAULT_HEARTBEAT_INTERVAL = 60;
 
   private Broadcaster heartbeat;
+  // REVISIST more appropriate to store this status in servetContext to avoid scheduling redundant heartbeats 
+  private boolean heartbeatScheduled;
   private final AsyncIOInterceptor interceptor = new Interceptor();
-
   public SimpleRestInterceptor() {
   }
 
@@ -85,15 +85,16 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
         // read the message entity and dispatch a service call
         String body = IOUtils.readEntirelyAsString(r).toString();
         LOG.info("Request message: '{}'", body);
-        //TODO after defining the payload format, define the specific classes instead of Map
         if (body.length() == 0) {
           //TODO we might want to move this heartbeat scheduling after the handshake phase (if that is added)
           if (AtmosphereResource.TRANSPORT.WEBSOCKET == r.transport() 
               && request.getAttribute(HEARTBEAT_SCHEDULED) == null) {
+            if (!r.isSuspended()) {
+              r.suspend();
+            }
             scheduleHeartbeat(r, System.identityHashCode(r));
             request.setAttribute(HEARTBEAT_SCHEDULED, "true");
           }
-
           return Action.CANCELLED;
         }
         //REVISIT find a more efficient way to read and extract the message data
@@ -125,9 +126,13 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
 
   private void scheduleHeartbeat(AtmosphereResource r, int id) {
     //REVISIT make the schedule configurable
-    heartbeat.addAtmosphereResource(r)
-      .scheduleFixedBroadcast(String.format(HEARTBEAT_TEMPLATE, System.identityHashCode(r), System.currentTimeMillis()), 
-                              DEFAULT_HEARTBEAT_INTERVAL, DEFAULT_HEARTBEAT_INTERVAL, TimeUnit.SECONDS);
+    heartbeat.addAtmosphereResource(r);
+    if (!heartbeatScheduled) {
+      String identity = UUID.randomUUID().toString();
+      heartbeat.scheduleFixedBroadcast(String.format(HEARTBEAT_TEMPLATE, identity, System.currentTimeMillis()),
+          DEFAULT_HEARTBEAT_INTERVAL, DEFAULT_HEARTBEAT_INTERVAL, TimeUnit.SECONDS);
+      heartbeatScheduled = true;
+    }
   }
 
   private AtmosphereRequest createAtmosphereRequest(AtmosphereRequest request, JSONEnvelopeReader jer) {
