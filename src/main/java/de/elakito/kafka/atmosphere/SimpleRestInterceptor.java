@@ -92,7 +92,7 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
             if (!r.isSuspended()) {
               r.suspend();
             }
-            scheduleHeartbeat(r, System.identityHashCode(r));
+            scheduleHeartbeat(r);
             request.setAttribute(HEARTBEAT_SCHEDULED, "true");
           }
           return Action.CANCELLED;
@@ -124,7 +124,7 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
     return Action.CONTINUE;
   }
 
-  private void scheduleHeartbeat(AtmosphereResource r, int id) {
+  private void scheduleHeartbeat(AtmosphereResource r) {
     //REVISIT make the schedule configurable
     heartbeat.addAtmosphereResource(r);
     if (!heartbeatScheduled) {
