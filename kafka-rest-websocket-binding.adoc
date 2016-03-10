@@ -17,7 +17,7 @@ REST over Websocket uses the following message format.
 .General Syntax
 ====
 {"id": "*_identifier_*", "method": "*_method_*", "path": "*_path_*", 
- "type": "*_type_header_*", "accept": "*_accept_header_*",
+ "type": "*_type_value_*", "accept": "*_accept_value_*",
  "data": *_content_*}
 ====
 where
@@ -28,7 +28,7 @@ where
 
       - *_path_* represents the request path,
 
-      - *_type_header_* and *_accept_header_* represent the optional content-type and accept headers,
+      - *_type_value_* and *_accept_value_* represent the optional content-type and accept header values.
 
       - *_content_* represents the optional content entity.
 
