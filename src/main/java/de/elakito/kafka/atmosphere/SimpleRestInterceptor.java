@@ -142,7 +142,7 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
       request.localAttributes().put(REQUEST_ID, id);
     }
     final String method = jer.getHeader("method"); 
-    final String path = jer.getHeader("path");
+    String path = jer.getHeader("path");
     final String type = jer.getHeader("type");
     final String accept = jer.getHeader("accept");
     b.method(method != null ? method : "GET").pathInfo(path != null ? path: "/");
@@ -155,6 +155,11 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
           b.contentType(type);
         }
         b.headers(headers);
+    }
+    final int qpos = path.indexOf('?');
+    if (qpos > 0) {
+      b.queryString(path.substring(qpos + 1));
+      path = path.substring(0, qpos);
     }
     final Reader data = jer.getReader();
     if (data != null) {
