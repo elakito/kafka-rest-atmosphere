@@ -34,10 +34,13 @@ where
 
 
 
-In the following sections, the messages used by the websocket binding of kafka-rest operations are described. All the operations supported by kafka-rest can be invoked over Websocket using this websocket binding.
-In addition to those operations, there are subscribe operations that are specifically included for this websocket binding.
+In the following sections, some of the supported operations are shown with the websocket binding.
+All the operations supported by kafka-rest can be invoked over Websocket using this websocket binding.
+In addition to those operations included in kafka-rest, there are subscribe operations that are 
+specifically included for the websocket binding.
 
 For details about all the operations supported by kafka-rest, please refer to kafka-rest's documentation [1].
+
 
 ==== Get the list of topics
 
@@ -271,6 +274,60 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
 {"id": "129", "method": "DELETE", "path": "/consumers/my_json_consumer_group/instances/my_json_instance"}
 ----
 
+==== Get information about partitions
+
+[caption="Format: "]
+.list
+
+====
+{"id": "*_identifier_*", "method": "GET", "path": "/topics/*_topic_*/partitions"}
+====
+
+.Sample Request (listing partitions for topic "test")
+----
+{"id": "127", "method": "GET", "path": "/topics/test/partitions"}
+----
+
+.sample Response
+----
+{"id": "127", "data": [{"partition":0,"leader":0,"replicas":[{"broker":0,"leader":true,"in_sync":true}]}]}
+----
+
+[caption="Format: "]
+.getPartition
+
+====
+{"id": "*_identifier_*", "method": "GET", "path": "/topics/*_topic_*/partitions/*_partition_*"}
+====
+
+.Sample Request (getting information about partion 0 or topic "test)
+----
+{"id": "128", "method": "GET", "path": "/topics/test/partitions/0"}
+----
+
+.sample Response
+----
+{"id": "128", "data": {"partition":0,"leader":0,"replicas":[{"broker":0,"leader":true,"in_sync":true}]}}
+----
+
+==== Committing offsets
+
+[caption="Format: "]
+.commitOffsets
+====
+{"id": "*_identifier_*", "method": "POST", "path": "/consumers/*_consumer_group_*/instances/*_instance_name_*/offsets"}
+====
+
+.Sample Request (commiting the offsets for consumer "my_instance" at consumer group "my_consumer_group")
+----
+{"id": "129", "method": "POST", "path": "/consumers/my_consumer_group/instances/my_instance/offsets", 
+ "accept" : "application/vnd.kafka.v1+json, application/vnd.kafka+json, application/json"}
+----
+
+.Sample Response
+----
+{"id": "129", "data": [{"topic":"test","partition":0,"consumed":45,"committed":45}]}
+----
 
 ==== References
 

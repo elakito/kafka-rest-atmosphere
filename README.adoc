@@ -4,9 +4,14 @@ This application is based on kafka-rest[1] (2.0.1) and use atmosphere[2] (2.4.3)
 transport to kafka-rest's API. As a result, the provided services can be invoked over either HTTP or Websocket.
 
 The advantage of using Websocket is its support of asynchronous duplex communication. Messages can be
-posted and received asynchronously. This particular application enables kafka-rest's REST services to be invoked
-over Websocket using atmpsphere. In addition, this application adds additional consumer services that utilize Websocket
-to transport messages continuously over the socket.
+posted and received asynchronously. This advantage can be particularly utilized when the communication protocol
+is specifically designed for a Websocket.
+
+In contrast, this particular application uses a different approach, namely
+enabling kafka-rest's REST services to be invoked over Websocket. In addition, additional consumer services are added
+to support the transport of messages continuously over the socket. Please refer to section Advantages and Disadvantages
+below for more details regarding this aspect.
+
 
 == Using Websocket
 
@@ -102,6 +107,22 @@ To unsubscribe from the topic
      "path": "/ws/consumers/<consumer_group>/instances/<instance_name>/topics/<topic>"}
 --------------------------------------
 
+=== Advantages and Disadvantages
+
+In the following, the advantages and disadvantages of this particular approach are described.
+
+===== Advantages
+
+- The client can use the same payload as used in kafka-rest's http proxy.
+- The existing kafka-rest services can be reused directly and invoked over either http or Websocket
+- The consumer specific subscription services are integrated to the existing kafka-rest's services so that
+messages can be transferred to the subscribers asynchronously.
+- The client can choose its preferred protocol based on its use cases.
+- The same transport security setting can be reused for both protocols.
+
+===== Disadvantages
+
+- There is an overhead in extracting the actual payload from a message sent over Websocket and internally invoking the target REST service, in contrast to extracing the payload and internally invoking Kafka's client API directly.
 
 === References
 - [1] link:https://github.com/confluentinc/kafka-rest[]
