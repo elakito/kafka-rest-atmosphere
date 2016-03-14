@@ -142,7 +142,7 @@ where *_consumer_group_* is a consumer group name, *_instance_name_* is a consum
 ----
 
 
-     - 3. Unsubscribe the topic
+     - 3. Unsubscribe from the topic
 
 [caption="Format: "]
 .unsubscribeTopic
@@ -310,7 +310,7 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
 {"id": "128", "data": {"partition":0,"leader":0,"replicas":[{"broker":0,"leader":true,"in_sync":true}]}}
 ----
 
-==== Consume messages from a specific partion (Binary Mode)
+==== Consume messages from a specific partition (Binary Mode)
 
 [caption="Format: "]
 .consumeBinary
@@ -320,7 +320,7 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
   "accept": "application/vnd.kafka.binary.v1+json"}
 ====
 
-.Sample Request (consume message with offset 45 from partion 0 of topic "test")
+.Sample Request (consume message with offset 45 from partition 0 of topic "test")
 ----
 {"id": "130", "method": "GET", "path": "/topics/test/partitions/0/messages?offset=45", 
   "accept" : "application/vnd.kafka.binary.v1+json"}
@@ -331,7 +331,7 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
 {"id": "130", "data": [{"key":null,"value":"S2Fma2E=","partition":0,"offset":45}]}
 ----
 
-==== Consume messages from a specific partion (JSON Mode)
+==== Consume messages from a specific partition (JSON Mode)
 
 [caption="Format: "]
 .consumeJSON
@@ -341,7 +341,7 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
   "accept": "application/vnd.kafka.json.v1+json"}
 ====
 
-.Sample Request (consume message with offset 45 from partion 0 of topic "jsontest")
+.Sample Request (consume message with offset 45 from partition 0 of topic "jsontest")
 ----
 {"id": "130", "method": "GET", "path": "/topics/jsontest/partitions/0/messages?offset=45", 
   "accept" : "application/vnd.kafka.json.v1+json"}
@@ -361,7 +361,7 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
 {"id": "*_identifier_*", "method": "POST", "path": "/consumers/*_consumer_group_*/instances/*_instance_name_*/offsets"}
 ====
 
-.Sample Request (commiting the offsets for consumer "my_instance" at consumer group "my_consumer_group")
+.Sample Request (committing the offsets for consumer "my_instance" at consumer group "my_consumer_group")
 ----
 {"id": "129", "method": "POST", "path": "/consumers/my_consumer_group/instances/my_instance/offsets", 
  "accept" : "application/vnd.kafka.v1+json, application/vnd.kafka+json, application/json"}
