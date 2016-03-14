@@ -84,7 +84,8 @@ refer to the kafka-rest documentation [4]
 === Additional operations supported for Websocket
 
 Addtional operations are specifically included for the Websocket binding to allow a consumer to subscribe
-to a topic and get messages pushed asynchronously over Websocket.
+to a topic and get messages pushed asynchronously over Websocket. This feature requires a modified version of 
+kafka-rest [5].
 
 To subscribe to a Binary topic
 
@@ -136,3 +137,5 @@ messages can be transferred to the subscribers asynchronously.
 - [3] link:kafka-rest-websocket-binding.adoc[]
 
 - [4] link:http://docs.confluent.io/2.0.0/kafka-rest/docs/index.html[]
+
+- [5] link:https://github.com/elakito/kafka-rest/tree/2.x-websocket[]

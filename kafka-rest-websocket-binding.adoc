@@ -374,4 +374,4 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
 
 ==== References
 
-- [1] http://docs.confluent.io/2.0.0/kafka-rest/docs/intro.html#produce-and-consume-binary-messages[]
+- [1] http://docs.confluent.io/2.0.0/kafka-rest/docs/index.html[]
