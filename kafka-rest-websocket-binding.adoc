@@ -28,16 +28,16 @@ where
 
       - *_path_* represents the request path,
 
-      - *_type_value_* and *_accept_value_* represent the optional content-type and accept header values.
+      - *_type_* and *_accept_* represent the optional content-type and accept header values.
 
       - *_content_* represents the optional content entity.
 
 
 
-In the following sections, some of the supported operations are shown with the websocket binding.
+In the following sections, some of the supported operations are shown in the websocket binding.
 All the operations supported by kafka-rest can be invoked over Websocket using this websocket binding.
-In addition to those operations included in kafka-rest, there are subscribe operations that are 
-specifically included for the websocket binding.
+In addition to those operations suported by kafka-rest, there are subscribe operations that are 
+specifically supported for the websocket binding.
 
 For details about all the operations supported by kafka-rest, please refer to kafka-rest's documentation [1].
 
