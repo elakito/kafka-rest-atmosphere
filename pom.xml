@@ -25,7 +25,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.elakito.kafka</groupId>
   <artifactId>kafka-rest-atmosphere</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
     <!--  properties in alphabetical order -->
