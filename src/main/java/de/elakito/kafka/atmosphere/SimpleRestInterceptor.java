@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -31,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.ServletException;
 
 import org.atmosphere.cpr.Action;
+import org.atmosphere.cpr.ApplicationConfig;
 import org.atmosphere.cpr.AsyncIOInterceptor;
 import org.atmosphere.cpr.AsyncIOInterceptorAdapter;
 import org.atmosphere.cpr.AsyncIOWriter;
@@ -40,6 +42,8 @@ import org.atmosphere.cpr.AtmosphereInterceptorWriter;
 import org.atmosphere.cpr.AtmosphereRequest;
 import org.atmosphere.cpr.AtmosphereRequestImpl;
 import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.AtmosphereResourceEvent;
+import org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter;
 import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.cpr.Broadcaster;
 import org.atmosphere.cpr.DefaultBroadcaster;
@@ -71,8 +75,10 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
   private final static String HEARTBEAT_TEMPLATE = "{\"heartbeat\": \"%s\", \"time\": %d}";
   private final static long DEFAULT_HEARTBEAT_INTERVAL = 60;
 
+  private Map<String, AtmosphereResponse> suspendedResponses = new HashMap<String, AtmosphereResponse>();
+  
   private Broadcaster heartbeat;
-  // REVISIST more appropriate to store this status in servetContext to avoid scheduling redundant heartbeats 
+  // REVISIST more appropriate to store this status in servetContext to avoid scheduling redundant heartbeats?
   private boolean heartbeatScheduled;
   private final AsyncIOInterceptor interceptor = new Interceptor();
   public SimpleRestInterceptor() {
@@ -90,31 +96,91 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
 
   @Override
   public Action inspect(final AtmosphereResource r) {
-    if (AtmosphereResource.TRANSPORT.WEBSOCKET != r.transport()) {
+    if (AtmosphereResource.TRANSPORT.WEBSOCKET != r.transport() 
+        && AtmosphereResource.TRANSPORT.SSE != r.transport()
+        && AtmosphereResource.TRANSPORT.POLLING != r.transport()) {
       //TODO swtich the logging to debug
       LOG.info("Skipping for non websocket request");
       return Action.CONTINUE;
     }
+    if (AtmosphereResource.TRANSPORT.POLLING == r.transport()) {
+      final String saruuid = (String)r.getRequest().getAttribute(ApplicationConfig.SUSPENDED_ATMOSPHERE_RESOURCE_UUID);
+      final AtmosphereResponse suspendedResponse = suspendedResponses.get(saruuid);
+      LOG.info("Attaching a proxy writer to suspended response");
+      r.getResponse().asyncIOWriter(new AtmosphereInterceptorWriter() {
+          @Override
+          public AsyncIOWriter write(AtmosphereResponse r, String data) throws IOException {
+            suspendedResponse.write(data);
+            suspendedResponse.flushBuffer();
+            return this;
+          }
+
+          @Override
+          public AsyncIOWriter write(AtmosphereResponse r, byte[] data) throws IOException {
+            suspendedResponse.write(data);
+            suspendedResponse.flushBuffer();
+            return this;
+          }
+
+          @Override
+          public AsyncIOWriter write(AtmosphereResponse r, byte[] data, int offset, int length) throws IOException {
+            suspendedResponse.write(data, offset, length);
+            suspendedResponse.flushBuffer();
+            return this;
+          }
+      });
+      // REVISIT we need to keep this response's asyncwriter alive so that data can be written to the 
+      //   suspended response, but investigate if there is a better alternative. 
+      r.getResponse().destroyable(false);
+      return Action.CONTINUE;
+    }
+
+    r.addEventListener(new AtmosphereResourceEventListenerAdapter() {
+      @Override
+      public void onSuspend(AtmosphereResourceEvent event) {
+        final String srid = (String)event.getResource().getRequest().getAttribute(ApplicationConfig.SUSPENDED_ATMOSPHERE_RESOURCE_UUID);
+        LOG.info("Registrering suspended resource: {}", srid);
+        suspendedResponses.put(srid, event.getResource().getResponse());
+
+        AsyncIOWriter writer = event.getResource().getResponse().getAsyncIOWriter();
+        if (writer == null) {
+            writer = new AtmosphereInterceptorWriter();
+            r.getResponse().asyncIOWriter(writer);
+        }
+        if (writer instanceof AtmosphereInterceptorWriter) {
+            ((AtmosphereInterceptorWriter)writer).interceptor(interceptor);
+        }
+      }
+
+      @Override
+      public void onDisconnect(AtmosphereResourceEvent event) {
+        super.onDisconnect(event);
+        final String srid = (String)event.getResource().getRequest().getAttribute(ApplicationConfig.SUSPENDED_ATMOSPHERE_RESOURCE_UUID);
+        LOG.info("Unregistrering suspended resource: {}", srid);
+        suspendedResponses.remove(srid);
+      }
+
+    });
+
     AtmosphereRequest request = r.getRequest();
     if (request.getAttribute(REQUEST_DISPATCHED) == null) {
       try {
-        //TODO add LONG_POLLING handling?
-
         // read the message entity and dispatch a service call
         String body = IOUtils.readEntirelyAsString(r).toString();
         LOG.info("Request message: '{}'", body);
         if (body.length() == 0) {
           //TODO we might want to move this heartbeat scheduling after the handshake phase (if that is added)
-          if (AtmosphereResource.TRANSPORT.WEBSOCKET == r.transport() 
+          if ((AtmosphereResource.TRANSPORT.WEBSOCKET == r.transport() ||
+               AtmosphereResource.TRANSPORT.SSE == r.transport())
               && request.getAttribute(HEARTBEAT_SCHEDULED) == null) {
-            if (!r.isSuspended()) {
-              r.suspend();
-            }
+            r.suspend();
             scheduleHeartbeat(r);
             request.setAttribute(HEARTBEAT_SCHEDULED, "true");
+            return Action.SUSPEND;
           }
           return Action.CANCELLED;
         }
+
         //REVISIT find a more efficient way to read and extract the message data
         JSONEnvelopeReader jer = new JSONEnvelopeReader(new StringReader(body));
 
@@ -124,6 +190,7 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
 
         request.removeAttribute(FrameworkConfig.INJECTED_ATMOSPHERE_RESOURCE);
         response.request(ar);
+
         attachWriter(r);
 
         Action action = r.getAtmosphereConfig().framework().doCometSupport(ar, response);
@@ -190,10 +257,12 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
   }
 
   private byte[] createResponse(AtmosphereResponse response, byte[] payload) {
+    //TODO swtich the logging to debug
+    LOG.info("createResponse: payload=" + new String(payload));
     AtmosphereRequest request = response.request();
     String id = (String)request.getAttribute(REQUEST_ID);
     if (id == null) {
-      // control response such as heartbeat
+      // control response such as heartbeat or plain responses
       return payload;
     }
     //TODO find a nicer way to build the response entity
