@@ -60,6 +60,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
  * This protocol is a simplified version of SwaggerSocket. 
  * https://github.com/swagger-api/swaggersocket
  * 
+ * This interceptor can currently handle both Websocket and SSE protocols.
+ * 
  * @author elakito
  *
  */

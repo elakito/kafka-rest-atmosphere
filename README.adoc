@@ -10,10 +10,17 @@ Messages can be sent and received asynchronously on a single connection.
 This advantage could be particularly utilized when the protocol gateway is specifically designed for a Websocket.
 
 In contrast, this particular gateway uses a different approach, namely
-using kafka-rest's existing REST services and transparently enabling those services to be invoked over Websocket. 
+using kafka-rest's existing REST services and transparently enabling those services to be invoked over Websocket
+and other protocols such as Server-Side-Events (SSE) using atmosphere.
 In addition, new consumer services are added to support the transport of messages continuously over the socket.
 There are advantages and disadvantages in this approach. For more details, 
 please refer to section Advantages and Disadvantages.
+
+== Deployment
+
+The shell scripts bin/kafka-rest-atmosphere-start and bin/kafka-rest-atmosphere-stop 
+can be used to start or stop the standalone server, respectively.
+
 
 == Using Websocket
 
@@ -22,7 +29,8 @@ please refer to section Advantages and Disadvantages.
 Use your websocket client to connect to ws://localhost:8082
 For example, you can use the Echo demo at http://www.websocket.org/echo.html as your client and 
 connect to the server at ws://hostname:8082/ and paste the appropriate JSON messages in its 
-Message text field.
+Message text field. There is also a node client based on atmosphere.js available
+at src/test/resources/node/.
 
 
 === Invoking operations
@@ -122,7 +130,7 @@ In the following, the advantages and disadvantages of this particular approach a
 messages can be transferred to the subscribers asynchronously.
 - The client can choose its preferred protocol based on its use cases.
 - The same transport security setting can be reused for both protocols.
-- atmosphere supports a wide variety of other protocols and some of them could be of interest to be added.
+- atmosphere supports additional protocols such as SSE which can also be supported along with Websocket.
 
 ===== Disadvantages
 
