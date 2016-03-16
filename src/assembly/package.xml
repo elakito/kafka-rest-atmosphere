@@ -11,11 +11,20 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
+            <!-- kafka-rest-atmosphere documents in its own folder doc/kafka-rest-atmosphere -->
             <directory>${project.basedir}</directory>
-            <outputDirectory>share/doc/kafka-rest/</outputDirectory>
+            <outputDirectory>share/doc/kafka-rest-atmosphere/</outputDirectory>
             <includes>
                 <include>README*</include>
                 <include>*.adoc</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <!-- node.js demo client under utils/kafka-rest-atmosphere -->
+            <directory>${project.basedir}/src/test/resources</directory>
+            <outputDirectory>share/utils/kafka-rest-atmosphere/</outputDirectory>
+            <includes>
+                <include>node/*</include>
             </includes>
         </fileSet>
         <fileSet>

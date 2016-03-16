@@ -1,9 +1,10 @@
 = kafka-rest-atmosphere
 
-This is a protocol gateway or proxy based on kafka-rest[1] (2.0.1) and atmosphere[2] (2.4.3) to transparently 
-add a Websocket based transport binding to kafka-rest's HTTP REST proxy. 
-As a result, the provided services of kafka-rest can be invoked over either HTTP or Websocket and in addition, 
-new services utilizing Websocket can also be supported.
+This is a proxy gateway based on kafka-rest[1] (2.0.1) and atmosphere[2] (2.4.3) to transparently 
+add a Websocket based transport binding to kafka-rest's HTTP REST proxy gateway. 
+As a result, the provided services of kafka-rest can be invoked over HTTP or Websocket and possibly other
+protocols supported by atmosphere. In addition, new services utilizing Websocket can also be supported
+in the same gateway.
 
 The advantage of using Websocket is its support of asynchronous duplex communication over a single socket. 
 Messages can be sent and received asynchronously on a single connection. 
@@ -18,9 +19,9 @@ please refer to section Advantages and Disadvantages.
 
 == Deployment
 
-The shell scripts bin/kafka-rest-atmosphere-start and bin/kafka-rest-atmosphere-stop 
-can be used to start or stop the standalone server, respectively.
-
+The shell scripts bin/kafka-rest-atmosphere-start and bin/kafka-rest-atmosphere-stop are
+available in package's bin folder. They are based on kafka-rest's shell scripts and 
+can be used to start or stop the standalone kafka-rest-atmosphere server, respectively.
 
 == Using Websocket
 
@@ -28,9 +29,9 @@ can be used to start or stop the standalone server, respectively.
 
 Use your websocket client to connect to ws://localhost:8082
 For example, you can use the Echo demo at http://www.websocket.org/echo.html as your client and 
-connect to the server at ws://hostname:8082/ and paste the appropriate JSON messages in its 
+connect to the server at ws://localhost:8082/ and paste the appropriate JSON messages in its 
 Message text field. There is also a node client based on atmosphere.js available
-at src/test/resources/node/.
+at package's link:https://github.com/elakito/kafka-rest-atmosphere/tree/master/src/test/resources/node[share/utils/node].
 
 
 === Invoking operations
@@ -136,6 +137,11 @@ messages can be transferred to the subscribers asynchronously.
 
 - There is an overhead in extracting the actual payload from a message sent over Websocket and internally invoking the target REST service, in contrast to extracing the payload and internally invoking Kafka's client API directly.
 
+== Using Other protocols
+
+Currently, Server-Side-Events (SSE) is also supported to receive responses over a single connection that is kept open.
+
+For HTTP, please refer to the documentation for kafka-rest [4].
 
 === References
 - [1] link:https://github.com/confluentinc/kafka-rest[]
