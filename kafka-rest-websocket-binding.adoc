@@ -1,7 +1,7 @@
 == Websocket binding used for Kafka-REST
 
 Assume the version of the Websocket binding and the use of optional features has been negotiated during 
-the handshake phase after the socket is open. This Websocket binding is characterized by the following rules.
+the handshake phase after the socket is open. This Websocket binding is based on SwaggerSocket[1]. It can be considered as a simplified version and possibly its future version. It is characterized by the following rules.
 
 - Each request contains the method, path, and optional type and data.
 - Each request may be sent with a unique-ID for the client to correlate its response to the request.
@@ -39,7 +39,7 @@ All the operations supported by kafka-rest can be invoked over Websocket using t
 In addition to those operations suported by kafka-rest, there are subscribe operations that are 
 specifically supported for the websocket binding.
 
-For details about all the operations supported by kafka-rest, please refer to kafka-rest's documentation [1].
+For details about all the operations supported by kafka-rest, please refer to kafka-rest's documentation [2].
 
 
 ==== Get the list of topics
@@ -374,4 +374,6 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
 
 ==== References
 
-- [1] http://docs.confluent.io/2.0.0/kafka-rest/docs/index.html[]
+- [1] https://github.com/swagger-api/swagger-socket[]
+
+- [2] http://docs.confluent.io/2.0.0/kafka-rest/docs/index.html[]
