@@ -13,6 +13,11 @@ the handshake phase after the socket is open. This Websocket binding is based on
 
 REST over Websocket uses the following message format.
 
+CAUTION: The format described in this document correspond to the behavior implemented for kafka-rest-websocket version 0.0.1. 
+This format will be changed to support returning the response as a series of chunked data when the response is writte with a series
+of write operations.
+
+
 [caption="Format: "]
 .General Syntax
 ====

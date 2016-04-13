@@ -136,6 +136,7 @@ messages can be transferred to the subscribers asynchronously.
 ===== Disadvantages
 
 - There is an overhead in extracting the actual payload from a message sent over Websocket and internally invoking the target REST service, in contrast to extracing the payload and internally invoking Kafka's client API directly.
+- There is a limitation in the size of the response payload that can be returned as a single response. This size is limited by the buffer size of the underlining jaxrs and serialization framework (i.e., jersey uses the default buffer size of 8192 bytes, which can be changed by setting java system property jersey.config.io.bufferSize, however the buffer size is stil limited by sun.nio.cs.StreamEncoder, which uses the buffer size of 8192). This will be resolved in the next version by a large response to be returned as a series of chunked responses.
 
 == Using Other protocols
 
