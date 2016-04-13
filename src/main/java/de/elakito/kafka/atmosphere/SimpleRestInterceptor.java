@@ -22,7 +22,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -129,6 +128,10 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
             suspendedResponse.write(data, offset, length);
             suspendedResponse.flushBuffer();
             return this;
+          }
+
+          @Override
+          public void close(AtmosphereResponse response) throws IOException {
           }
       });
       // REVISIT we need to keep this response's asyncwriter alive so that data can be written to the 
@@ -287,12 +290,7 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
     AsyncIOWriter writer = res.getAsyncIOWriter();
 
     if (writer instanceof AtmosphereInterceptorWriter) {
-      //REVIST need a better way to add a custom filter at the first entry and not at the last as
-      // e.g. interceptor(AsyncIOInterceptor interceptor, int position)
-      Deque<AsyncIOInterceptor> filters = AtmosphereInterceptorWriter.class.cast(writer).filters();
-      if (!filters.contains(interceptor)) {
-        filters.addFirst(interceptor);
-      }
+      AtmosphereInterceptorWriter.class.cast(writer).interceptor(interceptor, 0);
     }
   }
 
