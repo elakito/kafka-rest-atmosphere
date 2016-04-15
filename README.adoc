@@ -136,7 +136,12 @@ messages can be transferred to the subscribers asynchronously.
 ===== Disadvantages
 
 - There is an overhead in extracting the actual payload from a message sent over Websocket and internally invoking the target REST service, in contrast to extracing the payload and internally invoking Kafka's client API directly.
-- There is a limitation in the size of the response payload that can be returned as a single response. This size is limited by the buffer size of the underlining jaxrs and serialization framework (i.e., jersey uses the default buffer size of 8192 bytes, which can be changed by setting java system property jersey.config.io.bufferSize, however the buffer size is stil limited by sun.nio.cs.StreamEncoder, which uses the buffer size of 8192). This will be resolved in the next version by a large response to be returned as a series of chunked responses.
+
+===== Current Limitation
+
+- There is a limitation in the size of the response payload that can be returned as a single response. This size limit is determined by the buffer size of the underlining jaxrs and serialization framework (i.e., jersey uses the default buffer size of 8192 bytes, which can be changed by setting java system property jersey.config.io.bufferSize, however the buffer size is stil limited by sun.nio.cs.StreamEncoder, which uses the buffer size of 8192). This will be resolved in the next version by a large response to be returned as a series of chunked responses.
+- When a topic is subscribed, the messages are initially retrieved using the same properties used by the normal polling consumer to package multiple messages in a single response. Subsequent messages are pushed over the channel one by one and there is no option to use the packaging for those messages.
+
 
 == Using Other protocols
 
@@ -149,7 +154,7 @@ For HTTP, please refer to the documentation for kafka-rest [4].
 
 - [2] link:https://github.com/Atmosphere/atmosphere[]
 
-- [3] link:kafka-rest-websocket-binding.adoc[]
+- [3] link:https://raw.githubusercontent.com/elakito/kafka-rest-atmosphere/master/kafka-rest-websocket-binding.adoc[kafka-rest-websocket-binding.adoc]
 
 - [4] link:http://docs.confluent.io/2.0.0/kafka-rest/docs/index.html[]
 
