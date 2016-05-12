@@ -45,14 +45,12 @@ import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter;
 import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.cpr.Broadcaster;
+import org.atmosphere.cpr.CompletionAware;
 import org.atmosphere.cpr.DefaultBroadcaster;
 import org.atmosphere.cpr.FrameworkConfig;
 import org.atmosphere.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 /**
  * Atmosphere interceptor to enable a simple rest-websocket binding protocol.
@@ -70,13 +68,18 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
   private final static String REQUEST_ID = "request.id";
   private final static byte[] RESPONSE_TEMPLATE_HEAD = "{\"id\": \"".getBytes();
   private final static byte[] RESPONSE_TEMPLATE_BELLY = "\", \"data\": ".getBytes();
+  private final static byte[] RESPONSE_TEMPLATE_BELLY_CONTINUE = "\", \"continue\":true, \"data\": ".getBytes();
+  private final static byte[] RESPONSE_TEMPLATE_BELLY_DETACHED = "\", \"detached\": true".getBytes();
+  private final static byte[] RESPONSE_TEMPLATE_BELLY_CONTINUE_DETACHED = "\", \"continue\":true, \"detached\": true".getBytes();
   private final static byte[] RESPONSE_TEMPLATE_TAIL = "}".getBytes();
+  private final static byte[] RESPONSE_TEMPLATE_NEWLINE = "\n".getBytes();
   private final static String HEARTBEAT_BROADCASTER_NAME = "/kafka-rest.heartbeat";
   private final static String HEARTBEAT_SCHEDULED = "heatbeat.scheduled";
   private final static String HEARTBEAT_TEMPLATE = "{\"heartbeat\": \"%s\", \"time\": %d}";
   private final static long DEFAULT_HEARTBEAT_INTERVAL = 60;
 
   private Map<String, AtmosphereResponse> suspendedResponses = new HashMap<String, AtmosphereResponse>();
+  private boolean detached;
   
   private Broadcaster heartbeat;
   // REVISIST more appropriate to store this status in servetContext to avoid scheduling redundant heartbeats?
@@ -88,6 +91,7 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
   @Override
   public void configure(AtmosphereConfig config) {
     super.configure(config);
+    detached = Boolean.parseBoolean(config.getInitParameter("atmosphere.simple-rest.protocol.detached"));
     //TODO make the heartbeat configurable
     heartbeat = config.getBroadcasterFactory().lookup(DefaultBroadcaster.class, HEARTBEAT_BROADCASTER_NAME);
     if (heartbeat == null) {
@@ -204,8 +208,6 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
           response.destroyable(false);
         }
         return Action.CANCELLED;
-      } catch (JsonParseException | JsonMappingException e) {
-        LOG.error("Invalid message format", e);
       } catch (IOException | ServletException e) {
         LOG.error("Failed to process", e);
       }
@@ -276,21 +278,51 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
       try {
         baos.write(RESPONSE_TEMPLATE_HEAD);
         baos.write(id.getBytes());
-        baos.write(RESPONSE_TEMPLATE_BELLY);
-        baos.write(payload);
-        baos.write(RESPONSE_TEMPLATE_TAIL);
+        if (detached) {
+          // {"id":...,  "detached": true}\n
+          // <payload>
+          if (isLastResponse(request, response)) {
+            baos.write(RESPONSE_TEMPLATE_BELLY_DETACHED);
+          } else {
+            baos.write(RESPONSE_TEMPLATE_BELLY_CONTINUE_DETACHED);
+          }
+          baos.write(RESPONSE_TEMPLATE_TAIL);
+          baos.write(RESPONSE_TEMPLATE_NEWLINE);
+          baos.write(payload);
+        } else {
+          // {"id":..., "data": <payload>}
+          boolean isobj = isJSONObject(payload);
+          if (isLastResponse(request, response)) {
+            baos.write(RESPONSE_TEMPLATE_BELLY);
+          } else {
+            baos.write(RESPONSE_TEMPLATE_BELLY_CONTINUE);
+          }
+          if (!isobj) {
+            baos.write(quote(payload));
+          } else {
+            baos.write(payload);
+          }
+          baos.write(RESPONSE_TEMPLATE_TAIL);
+        }
+        
       } catch (IOException e) {
         //ignore as it can't happen
       }
     }
     return baos.toByteArray();
   }
+  
+  private static boolean isLastResponse(AtmosphereRequest request, AtmosphereResponse response) {
+    return (response instanceof CompletionAware && ((CompletionAware)response).completed())
+        || Boolean.TRUE != request.getAttribute(ApplicationConfig.RESPONSE_COMPLETION_AWARE);
+  }
+
   private void attachWriter(final AtmosphereResource r) {
     AtmosphereResponse res = r.getResponse();
     AsyncIOWriter writer = res.getAsyncIOWriter();
 
     if (writer instanceof AtmosphereInterceptorWriter) {
-      AtmosphereInterceptorWriter.class.cast(writer).interceptor(interceptor, 0);
+      ((AtmosphereInterceptorWriter)writer).interceptor(interceptor, 0);
     }
   }
 
@@ -299,5 +331,21 @@ public class SimpleRestInterceptor extends AtmosphereInterceptorAdapter {
     public byte[] transformPayload(AtmosphereResponse response, byte[] responseDraft, byte[] data) throws IOException {
       return createResponse(response, responseDraft);
     }
-  }    
+  }
+  
+  private static boolean isJSONObject(byte[] b) {
+    return b.length > 0 && (b[0] == (byte)'[' || b[0] == (byte)'{');   
+  }
+  private static byte[] quote(byte[] b) {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    baos.write('"');
+    for (byte c : b) {
+      if (c == '"') {
+        baos.write('\\');
+      }
+      baos.write(c);
+    }
+    baos.write('"');
+    return baos.toByteArray();
+  }
 }
