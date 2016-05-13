@@ -59,7 +59,7 @@ function getNextId() {
 }
 
 function selectOption(c, opts) {
-    var i = parseInt(c);
+    var i = c.length == 0 ? 0 : parseInt(c);
     if (!(i >= 0 && i < opts.length)) {
         console.log('Invalid selection: ' + c + '; Using ' + opts[0]);
         i = 0;
@@ -148,6 +148,14 @@ function errorUsage(v, msg) {
     }
 }
 
+function queryTransport() {
+    console.log("Select transport ...");
+    for (var i = 0; i < TRANSPORT_NAMES.length; i++) { 
+        console.log(i + ": " + TRANSPORT_NAMES[i]);
+    }
+    prompt.setPrompt("select: ", 6);
+    prompt.prompt();
+}
 
 /////////////// commands
 
@@ -373,8 +381,22 @@ request.onReconnect = function(response) {
 
 request.onMessage = function (response) {
     var message = response.responseBody;
+    var jpart;
+    var data;
+    var json;
+    //FIXME use a better logic to determine the mode
+    if (message.indexOf("detached") > 0) {
+        var d = message.indexOf('\n');
+        if (d > 0) {
+            data = message.substring(d + 1);
+            jpart = message.substring(0, d);
+        }
+    }
+    if (!jpart) {
+        jpart = message;
+    }
     try {
-        var json = JSON.parse(message);
+        json = JSON.parse(jpart);
     } catch (e) {
         console.log('Invalid response: ', message);
         return;
@@ -400,6 +422,8 @@ request.onMessage = function (response) {
                 } else {
                     console.log("res" + json.id + ":", atmosphere.util.stringifyJSON(json.data));
                 }
+            } else if (data) {
+                console.log("res" + json.id + ":", data);
             } else {
                 console.log("res" + json.id + ":", atmosphere.util.stringifyJSON(json.data));
             }
@@ -423,14 +447,8 @@ request.onError = function(response) {
 
 var transport = null;
 var subSocket = null;
-console.log("Select transport ...");
-for (var i = 0; i < TRANSPORT_NAMES.length; i++) { 
-    console.log(i + ": " + TRANSPORT_NAMES[i]);
-}
-prompt.setPrompt("select: ", 6);
-prompt.prompt();
 
-
+queryTransport();
 
 prompt.
 on('line', function(line) {
@@ -448,8 +466,7 @@ on('line', function(line) {
                     process.exit(0);
                 }
             }, 3000);
-        }
-        else if (msg.length == 0) {
+        } else if (msg.length == 0) {
             doHelp();
         } else if (msg.indexOf("cre") == 0) {
             doCreate(getArgs("cre", msg, 3));
