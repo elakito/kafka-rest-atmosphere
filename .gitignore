@@ -1,9 +1,8 @@
 .DS_Store
 .checkstyle
-.classpath
+.idea
+*.iml
 .pmd
-.project
 .ruleset
-.settings/
 target/
 node_modules/
