@@ -36,7 +36,7 @@ public class KafkaRestAtmosphereConfig extends KafkaRestConfig {
   public static final String ATMOSPHERE_SIMPLE_REST_PROTOCOL_DETACHED_CONFIG = "atmosphere.simple-rest.protocol.detached";
   private static final String ATMOSPHERE_SIMPLE_REST_PROTOCOL_DETACHED_DOC =
       "The boolean flag used to enable the detache envelope mode of atmosphere-simple-rest";
-  public static final String ATMOSPHERE_SIMPLE_REST_PROTOCOL_DETACHED_DEFAULT = "true";
+  public static final String ATMOSPHERE_SIMPLE_REST_PROTOCOL_DETACHED_DEFAULT = "false";
 
   static {
     config.define(ATMOSPHERE_SIMPLE_REST_PROTOCOL_DETACHED_CONFIG, Type.BOOLEAN, ATMOSPHERE_SIMPLE_REST_PROTOCOL_DETACHED_DEFAULT,

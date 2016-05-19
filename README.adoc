@@ -23,6 +23,22 @@ The shell scripts bin/kafka-rest-atmosphere-start and bin/kafka-rest-atmosphere-
 available in package's bin folder. They are based on kafka-rest's shell scripts and 
 can be used to start or stop the standalone kafka-rest-atmosphere server, respectively.
 
+=== Configuration
+
+To change the default setting, customize properties in etc/kafka-rest/kafka-rest.properties.
+In addition to the properties supported by kafka-rest, the following properties can be set.
+
+.Configuration Properties
+|===
+| Name | Description | Default
+
+| atmosphere.simple-rest.protocol.detached
+| uses the detached content mode
+| false
+|===
+
+
+
 == Using Websocket
 
 === Connecting
@@ -139,8 +155,7 @@ messages can be transferred to the subscribers asynchronously.
 
 ===== Current Limitation
 
-- There is a limitation in the size of the response payload that can be returned as a single response. This size limit is determined by the buffer size of the underlining jaxrs and serialization framework (i.e., jersey uses the default buffer size of 8192 bytes, which can be changed by setting java system property jersey.config.io.bufferSize, however the buffer size is stil limited by sun.nio.cs.StreamEncoder, which uses the buffer size of 8192). This will be resolved in the next version by a large response to be returned as a series of chunked responses.
-- When a topic is subscribed, the messages are initially retrieved using the same properties used by the normal polling consumer to package multiple messages in a single response. Subsequent messages are pushed over the channel one by one and there is no option to use the packaging for those messages.
+- When a topic is subscribed, the messages are initially retrieved using the same properties used by the normal polling consumer to package multiple messages in a single response. Subsequent messages are pushed over the channel one by one and there is no currently option to use the packaging multiple messages for those messages.
 
 
 == Using Other protocols

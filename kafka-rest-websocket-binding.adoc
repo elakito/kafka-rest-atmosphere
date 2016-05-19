@@ -23,7 +23,9 @@ of write operations.
 ====
 {"id": "*_identifier_*", "method": "*_method_*", "path": "*_path_*", 
  "type": "*_type_value_*", "accept": "*_accept_value_*",
+ "detached": *_detached_*,
  "data": *_content_*}
+*_detached_content_*
 ====
 where
 
@@ -35,8 +37,11 @@ where
 
       - *_type_* and *_accept_* represent the optional content-type and accept header values.
 
-      - *_content_* represents the optional content entity.
+      - *_detached_* represents the optional boolean value which indicates the optional content is detached or embedded in the JSON envelope.
 
+      - *_content_* represents the optional embedded content entity.
+
+      - *_detached_content_* represents the optional detached content entity.
 
 
 In the following sections, some of the supported operations are shown in the websocket binding.
