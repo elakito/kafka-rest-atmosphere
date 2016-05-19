@@ -31,6 +31,7 @@ import org.atmosphere.handler.ReflectorServletProcessor;
 import org.atmosphere.interceptor.CacheHeadersInterceptor;
 import org.atmosphere.interceptor.HeartbeatInterceptor;
 import org.atmosphere.interceptor.JavaScriptProtocol;
+import org.atmosphere.interceptor.SimpleRestInterceptor;
 import org.atmosphere.interceptor.SSEAtmosphereInterceptor;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
@@ -145,7 +146,8 @@ public class AtmosphereApplication extends KafkaRestApplication {
       servletHolder.setInitParameter(ApplicationConfig.WEBSOCKET_SUPPORT, "true");
       servletHolder.setInitParameter(ApplicationConfig.WEBSOCKET_PROTOCOL_EXECUTION, "true");
       servletHolder.setInitParameter(ApplicationConfig.ANALYTICS, "false");
-      
+      servletHolder.setInitParameter(ApplicationConfig.RESPONSE_COMPLETION_AWARE, "true");
+
       if (config.getBoolean(KafkaRestAtmosphereConfig.ATMOSPHERE_SIMPLE_REST_PROTOCOL_DETACHED_CONFIG)) {
         servletHolder.setInitParameter(KafkaRestAtmosphereConfig.ATMOSPHERE_SIMPLE_REST_PROTOCOL_DETACHED_CONFIG, "true");
       }
