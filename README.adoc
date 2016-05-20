@@ -23,6 +23,11 @@ The shell scripts bin/kafka-rest-atmosphere-start and bin/kafka-rest-atmosphere-
 available in package's bin folder. They are based on kafka-rest's shell scripts and 
 can be used to start or stop the standalone kafka-rest-atmosphere server, respectively.
 
+=== Download
+
+  tar xzf kafka-rest-atmosphere-0.0.2-package.tgz
+  cd kafka-rest-atmosphere-0.0.2-package
+
 === Configuration
 
 To change the default setting, customize properties in etc/kafka-rest/kafka-rest.properties.
@@ -37,6 +42,13 @@ In addition to the properties supported by kafka-rest, the following properties 
 | false
 |===
 
+=== Start the server
+
+  bin/kafka-rest-atmosphere-start etc/kafka-rest/kafka-rest.properties
+
+=== Stop the server
+
+  bin/kafka-rest-atmosphere-stop
 
 
 == Using Websocket
