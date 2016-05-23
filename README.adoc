@@ -1,6 +1,6 @@
 = kafka-rest-atmosphere
 
-This is a proxy gateway based on kafka-rest[1] (2.0.1) and atmosphere[2] (2.4.3) to transparently 
+This is a proxy gateway based on kafka-rest[1] (2.0.1) and atmosphere[2] (2.4.4) to transparently 
 add a Websocket based transport binding to kafka-rest's HTTP REST proxy gateway. 
 As a result, the provided services of kafka-rest can be invoked over HTTP or Websocket and possibly other
 protocols supported by atmosphere. In addition, new services utilizing Websocket can also be supported
@@ -24,6 +24,9 @@ available in package's bin folder. They are based on kafka-rest's shell scripts 
 can be used to start or stop the standalone kafka-rest-atmosphere server, respectively.
 
 === Download
+
+A binary package is available from
+link:https://www.dropbox.com/sh/13priw6v60c2hi0/AABmff43g-tBKkkxHFGvp5mVa[here].
 
   tar xzf kafka-rest-atmosphere-0.0.2-package.tgz
   cd kafka-rest-atmosphere-0.0.2-package
