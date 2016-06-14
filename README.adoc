@@ -74,12 +74,17 @@ format using the following JSON format.
 --------------------------------------
    {"id": "<identifier>", "method": "<method>", "path": "<path>", 
     "type": "<type_header>", "accept": "<accept_header>",
-    "data": <content>}
+    "data": <content>, "detached": <detached>, "continue": <continue>}
+   <detached_content>
 --------------------------------------
 
 where <identifier> represents an identifier to correlate the response to its original request,
 <method> represents the request method, <path> represents the request path, <type_header> and <accept_header>
-represent the optional content-type and accept headers, and <content> represents the optinal content entity.
+represent the optional content-type and accept headers, and <content> represents the optional content entity.
+The content can be detached from the JSON envelope and placed after the envelope after a newline character 
+when the optional <detached> property is set to true. Finally, the optional <continue> property may be set to true
+to indicate the message is part of a sequence. Each sequence is identified by a unique <identifier>. The continued
+messages must be reassembled at the receiving end to produce the original data stream.
 
 For example, an HTTP request to list topics
 
@@ -123,7 +128,7 @@ refer to the kafka-rest documentation [4]
 
 === Additional operations supported for Websocket
 
-Addtional operations are specifically included for the Websocket binding to allow a consumer to subscribe
+Additional operations are specifically included for the Websocket binding to allow a consumer to subscribe
 to a topic and get messages pushed asynchronously over Websocket. This feature requires a modified version of 
 kafka-rest [5].
 
@@ -166,7 +171,7 @@ messages can be transferred to the subscribers asynchronously.
 
 ===== Disadvantages
 
-- There is an overhead in extracting the actual payload from a message sent over Websocket and internally invoking the target REST service, in contrast to extracing the payload and internally invoking Kafka's client API directly.
+- There is an overhead in extracting the actual payload from a message sent over Websocket and internally invoking the target REST service, in contrast to extracting the payload and internally invoking Kafka's client API directly.
 
 ===== Current Limitation
 
@@ -178,6 +183,22 @@ messages can be transferred to the subscribers asynchronously.
 Currently, Server-Side-Events (SSE) is also supported to receive responses over a single connection that is kept open.
 
 For HTTP, please refer to the documentation for kafka-rest [4].
+
+== Change Logs
+
+- 0.0.3-SNAPSHOT
+made the detached mode can be configured per connection
+switch to use atmosphere-2.4.5-SNAPSHOT to support the chunked request handling
+
+- 0.0.2
+added start/stop script 
+added the detached mode at the server's response generation
+added the detached mode response processing in the js client
+switched to use the new protocol interceptor added to atmpsphere-2.4.4
+use atmosphere's completion-aware feature to generate the correct continue flag in the chunked responses
+
+- 0.0.1
+the initial version using atmpsphre-2.4.3 with a custom protocol interceptor
 
 === References
 - [1] link:https://github.com/confluentinc/kafka-rest[]

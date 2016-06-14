@@ -8,13 +8,14 @@ the handshake phase after the socket is open. This Websocket binding is based on
 - Arbitrary Http headers in the request are not supported.
 - The content-type header can be optionally supplied if the content is present.
 - The accept header can be optionally supplied if the response is expected.
-- The content entity can be optionally supplied.
+- The content entity can be optionally supplied either within the JSON envelope or after the envelope.
+- A large message can be transported as a series of messages that can be reassembled at the receiving end.
 - The server can periodically send a heartbeat message to the connected clients to keep the connections alive.
 
 REST over Websocket uses the following message format.
 
-CAUTION: The format described in this document correspond to the behavior implemented for kafka-rest-websocket version 0.0.1. 
-This format will be changed to support returning the response as a series of chunked data when the response is writte with a series
+CAUTION: The format described in this document correspond to the behavior implemented for kafka-rest-websocket version 0.0.2. 
+This format will be changed to support returning the response as a series of chunked data when the response is written with a series
 of write operations.
 
 
@@ -24,7 +25,8 @@ of write operations.
 {"id": "*_identifier_*", "method": "*_method_*", "path": "*_path_*", 
  "type": "*_type_value_*", "accept": "*_accept_value_*",
  "detached": *_detached_*,
- "data": *_content_*}
+ "data": *_content_*,
+ "continue": *_continue_"}
 *_detached_content_*
 ====
 where
@@ -43,10 +45,12 @@ where
 
       - *_detached_content_* represents the optional detached content entity.
 
+      - *_continue_* represents the optional boolean value which indicates the message continues, in other words, followed by another message.
+
 
 In the following sections, some of the supported operations are shown in the websocket binding.
 All the operations supported by kafka-rest can be invoked over Websocket using this websocket binding.
-In addition to those operations suported by kafka-rest, there are subscribe operations that are 
+In addition to those operations supported by kafka-rest, there are subscribe operations that are 
 specifically supported for the websocket binding.
 
 For details about all the operations supported by kafka-rest, please refer to kafka-rest's documentation [2].
