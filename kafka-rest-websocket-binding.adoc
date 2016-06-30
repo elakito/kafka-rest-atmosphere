@@ -1,7 +1,7 @@
 == Websocket binding used for Kafka-REST
 
 Assume the version of the Websocket binding and the use of optional features has been negotiated during 
-the handshake phase after the socket is open. This Websocket binding is based on SwaggerSocket[1]. It can be considered as a simplified version and possibly its future version. It is characterized by the following rules.
+the handshake phase after the socket is open. This Websocket binding is originated from SwaggerSocket[1]. It can be considered as a simplified yet more efficient and flexible version of the original SwaggerSocket. The protocol handler used for this binding is included in Atmosphere 2.4.4 [2] and it can be used in any jaxrs applications. It is characterized by the following rules.
 
 - Each request contains the method, path, and optional type and data.
 - Each request may be sent with a unique-ID for the client to correlate its response to the request.
@@ -14,9 +14,7 @@ the handshake phase after the socket is open. This Websocket binding is based on
 
 REST over Websocket uses the following message format.
 
-CAUTION: The format described in this document correspond to the behavior implemented for kafka-rest-websocket version 0.0.2. 
-This format will be changed to support returning the response as a series of chunked data when the response is written with a series
-of write operations.
+CAUTION: The format described in this document correspond to the behavior implemented for kafka-rest-atmosphere version 0.0.2 [3]. 
 
 
 [caption="Format: "]
@@ -26,7 +24,7 @@ of write operations.
  "type": "*_type_value_*", "accept": "*_accept_value_*",
  "detached": *_detached_*,
  "data": *_content_*,
- "continue": *_continue_"}
+ "continue": *_continue_}
 *_detached_content_*
 ====
 where
@@ -47,13 +45,56 @@ where
 
       - *_continue_* represents the optional boolean value which indicates the message continues, in other words, followed by another message.
 
+===== Examples
+
+
+.A GET request to path /foo
+====
+{"id": "123", "method": "GET", "path": "/foo"}
+====
+
+.A POST request to path /foo with text content "Hello World!"
+====
+{"id": "123", "method": "POST", "path": "/foo", "type": "text/plain", "data": "Hello World!"}
+====
+
+.A POST request to path /foo with text content "Hello World!" in the detached mode
+====
+{"id": "123", "method": "POST", "path": "/foo", "type": "text/plain", "detached": true} +
+Hello World!
+====
+
+.A response with content "Hello World!"
+====
+{"id": "123", "data": "Hello World!"}
+====
+
+.A response with content "Hello World!" in the detached mode.
+====
+{"id": "123", "detached": true} +
+Hello World!
+====
+
+.A response with large content "From a ...... to z" split in two responses using the detached mode
+====
+{"id": "123", "continue": true, "detached": true} +
+From a ...
+====
+====
+{"id": "123", "detached": true} +
+... to z
+====
+
+
+
+=== Messages used in the websocket binding
 
 In the following sections, some of the supported operations are shown in the websocket binding.
 All the operations supported by kafka-rest can be invoked over Websocket using this websocket binding.
 In addition to those operations supported by kafka-rest, there are subscribe operations that are 
 specifically supported for the websocket binding.
 
-For details about all the operations supported by kafka-rest, please refer to kafka-rest's documentation [2].
+For details about all the operations supported by kafka-rest, please refer to kafka-rest's documentation [4].
 
 
 ==== Get the list of topics
@@ -390,4 +431,10 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
 
 - [1] https://github.com/swagger-api/swagger-socket[]
 
-- [2] http://docs.confluent.io/2.0.0/kafka-rest/docs/index.html[]
+- [2] https://github.com/Atmosphere/atmosphere[]
+
+- [3] https://github.com/elakito/kafka-rest-atmosphere[]
+
+- [4] http://docs.confluent.io/2.0.0/kafka-rest/docs/index.html[]
+
+
