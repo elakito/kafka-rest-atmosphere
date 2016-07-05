@@ -189,18 +189,19 @@ For HTTP, please refer to the documentation for kafka-rest [4].
 == Change Logs
 
 - 0.0.3-SNAPSHOT
-made the detached mode can be configured per connection
-switch to use atmosphere-2.4.5-SNAPSHOT to support the chunked request handling
+     ** made the detached mode can be configured per connection
+     ** switch to use atmosphere-2.4.6-SNAPSHOT to support the chunked request handling that can be configured per connection.
+     ** switch to use kafka-rest-atmosphere-2.0.1-elakito-03-SNAPSHOT to support aggregation of records for the subscription mode
 
 - 0.0.2
-added start/stop script 
-added the detached mode at the server's response generation
-added the detached mode response processing in the js client
-switched to use the new protocol interceptor added to atmpsphere-2.4.4
-use atmosphere's completion-aware feature to generate the correct continue flag in the chunked responses
+     ** added start/stop script 
+     ** added the detached mode at the server's response generation
+     ** added the detached mode response processing in the js client
+     ** switched to use the new protocol interceptor added to atmpsphere-2.4.4
+     ** use atmosphere's completion-aware feature to generate the correct continue flag in the chunked responses
 
 - 0.0.1
-the initial version using atmpsphre-2.4.3 with a custom protocol interceptor
+     ** the initial version using atmpsphre-2.4.3 with a custom protocol interceptor
 
 === References
 - [1] link:https://github.com/confluentinc/kafka-rest[]
