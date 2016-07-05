@@ -29,13 +29,13 @@
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
     <!--  properties in alphabetical order -->
-    <atmosphere-version>2.4.5</atmosphere-version>
+    <atmosphere-version>2.4.6-SNAPSHOT</atmosphere-version>
     <atmosphere-client-version>2.3.2</atmosphere-client-version>
     <easymock-version>3.1</easymock-version>
     <jersey-version>2.22.2</jersey-version>
     <jetty-version>9.2.13.v20150730</jetty-version>
     <junit-version>4.11</junit-version>
-    <kafka-rest-version>2.0.1-elakito-02</kafka-rest-version>
+    <kafka-rest-version>2.0.1-elakito-03-SNAPSHOT</kafka-rest-version>
   </properties>
   <build>
     <plugins>

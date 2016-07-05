@@ -26,7 +26,7 @@ can be used to start or stop the standalone kafka-rest-atmosphere server, respec
 === Download
 
 A binary package is available from
-link:https://www.dropbox.com/sh/13priw6v60c2hi0/AABmff43g-tBKkkxHFGvp5mVa[here].
+link:https://www.dropbox.com/sh/5qlq8rhq4gyk7wt/AABdzRI0socLxrbsJ7w-PelMa[here].
 
   tar xzf kafka-rest-atmosphere-0.0.2-package.tgz
   cd kafka-rest-atmosphere-0.0.2-package
@@ -64,6 +64,8 @@ connect to the server at ws://localhost:8082/ and paste the appropriate JSON mes
 Message text field. There is also a node client based on atmosphere.js available
 at package's link:https://github.com/elakito/kafka-rest-atmosphere/tree/master/src/test/resources/node[share/utils/node].
 
+One may add additional Atmosphere options in the query parameters on the initial request. One specific option supported
+by kafka-rest-atmosphere is parameter X-Atmosphere-SimpleRestProtocolDetached to dynamically enable or disable the detached mode per connection.
 
 === Invoking operations
 

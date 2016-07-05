@@ -13,8 +13,15 @@
 var HOST_URL = 'http://localhost:8082/';
 // set trace to true to increase trace output
 var TRACE = true;
-
 ///////
+
+if (process.argv.length >= 3) {
+    HOST_URL = process.argv[2]
+    if (!HOST_URL.endsWith('/')) {
+        HOST_URL += '/'
+    }
+}
+console.log("Host URL: " + HOST_URL)
 
 var reader = require('readline');
 var prompt = reader.createInterface(process.stdin, process.stdout);
