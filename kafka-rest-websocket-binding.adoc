@@ -1,7 +1,7 @@
 == Websocket binding used for Kafka-REST
 
 Assume the version of the Websocket binding and the use of optional features has been negotiated during 
-the handshake phase after the socket is open. This Websocket binding is originated from SwaggerSocket[1]. It can be considered as a simplified yet more efficient and flexible version of the original SwaggerSocket. The protocol handler used for this binding is included in Atmosphere 2.4.4 [2] and it can be used in any jaxrs applications. It is characterized by the following rules.
+the handshake phase after the socket is open. This Websocket binding is originated from SwaggerSocket[1]. It can be considered as a simplified yet more efficient and flexible version of the original SwaggerSocket. The protocol handler used for this binding is included in Atmosphere 2.4.4 and newer [2] and it can be used in any jaxrs applications. It is characterized by the following rules.
 
 - Each request contains the method, path, and optional type and data.
 - Each request may be sent with a unique-ID for the client to correlate its response to the request.

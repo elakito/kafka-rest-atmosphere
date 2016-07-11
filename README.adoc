@@ -1,26 +1,27 @@
 = kafka-rest-atmosphere
 
 This is a proxy gateway based on kafka-rest[1] (2.0.1) and atmosphere[2] (2.4.4) to transparently 
-add a Websocket based transport binding to kafka-rest's HTTP REST proxy gateway. 
+add a Websocket based transport to kafka-rest's HTTP REST proxy gateway. 
 As a result, the provided services of kafka-rest can be invoked over HTTP or Websocket and possibly other
 protocols supported by atmosphere. In addition, new services utilizing Websocket can also be supported
 in the same gateway.
 
 The advantage of using Websocket is its support of asynchronous duplex communication over a single socket. 
 Messages can be sent and received asynchronously on a single connection. 
-This advantage could be particularly utilized when the protocol gateway is specifically designed for a Websocket.
+This advantage could be particularly utilized when the protocol gateway is specifically designed and optimized
+for the Websocket transport.
 
 In contrast, this particular gateway uses a different approach, namely
 using kafka-rest's existing REST services and transparently enabling those services to be invoked over Websocket
 and other protocols such as Server-Side-Events (SSE) using atmosphere.
-In addition, new consumer services are added to support the transport of messages continuously over the socket.
+In addition, new consumer services are added to support the transport of messages over the socket continuously.
 There are advantages and disadvantages in this approach. For more details, 
 please refer to section Advantages and Disadvantages.
 
 == Deployment
 
 The shell scripts bin/kafka-rest-atmosphere-start and bin/kafka-rest-atmosphere-stop are
-available in package's bin folder. They are based on kafka-rest's shell scripts and 
+available in package's bin folder. These scripts are based on kafka-rest's shell scripts and 
 can be used to start or stop the standalone kafka-rest-atmosphere server, respectively.
 
 === Download
@@ -175,10 +176,6 @@ messages can be transferred to the subscribers asynchronously.
 
 - There is an overhead in extracting the actual payload from a message sent over Websocket and internally invoking the target REST service, in contrast to extracting the payload and internally invoking Kafka's client API directly.
 
-===== Current Limitation
-
-- When a topic is subscribed, the messages are initially retrieved using the same properties used by the normal polling consumer to package multiple messages in a single response. Subsequent messages are pushed over the channel one by one and there is no currently option to use the packaging multiple messages for those messages.
-
 
 == Using Other protocols
 
@@ -189,9 +186,9 @@ For HTTP, please refer to the documentation for kafka-rest [4].
 == Change Logs
 
 - 0.0.3-SNAPSHOT
-     ** made the detached mode can be configured per connection
-     ** switch to use atmosphere-2.4.6-SNAPSHOT to support the chunked request handling that can be configured per connection.
-     ** switch to use kafka-rest-atmosphere-2.0.1-elakito-03-SNAPSHOT to support aggregation of records for the subscription mode
+     ** made the detached mode can be configured per connection (using atmosphere-2.4.6-SNAPSHOT)
+     ** support the chunked request handling (using atmosphere-2.4.6-SNAPSHOT)
+     ** support aggregation of records when the subscription mode (using kafka-rest-atmosphere-2.0.1-elakito-03-SNAPSHOT)
 
 - 0.0.2
      ** added start/stop script 
