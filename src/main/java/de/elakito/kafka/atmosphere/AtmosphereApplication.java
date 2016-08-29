@@ -147,11 +147,19 @@ public class AtmosphereApplication extends KafkaRestApplication {
       servletHolder.setInitParameter(ApplicationConfig.WEBSOCKET_PROTOCOL_EXECUTION, "true");
       servletHolder.setInitParameter(ApplicationConfig.ANALYTICS, "false");
       servletHolder.setInitParameter(ApplicationConfig.RESPONSE_COMPLETION_AWARE, "true");
+      servletHolder.setInitParameter(ApplicationConfig.RESPONSE_COMPLETION_RESET, "true");
 
       if (config.getBoolean(KafkaRestAtmosphereConfig.ATMOSPHERE_SIMPLE_REST_PROTOCOL_DETACHED_CONFIG)) {
         servletHolder.setInitParameter(KafkaRestAtmosphereConfig.ATMOSPHERE_SIMPLE_REST_PROTOCOL_DETACHED_CONFIG, "true");
       }
-      
+
+      for (String key : KafkaRestAtmosphereConfig.ATMOSPHERE_PARAMETERS) {
+        String v = config.getString(key);
+        if (v.length() > 0) {
+          servletHolder.setInitParameter(key, v);
+        }
+      }
+
     }
     return servletHolder;
   }

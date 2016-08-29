@@ -26,6 +26,7 @@ import io.confluent.kafkarest.KafkaRestConfig;
 import io.confluent.kafkarest.SystemTime;
 import io.confluent.kafkarest.Time;
 import io.confluent.rest.RestConfigException;
+import org.atmosphere.cpr.ApplicationConfig;
 
 /**
  * 
@@ -37,10 +38,22 @@ public class KafkaRestAtmosphereConfig extends KafkaRestConfig {
   private static final String ATMOSPHERE_SIMPLE_REST_PROTOCOL_DETACHED_DOC =
       "The boolean flag used to enable the detache envelope mode of atmosphere-simple-rest";
   public static final String ATMOSPHERE_SIMPLE_REST_PROTOCOL_DETACHED_DEFAULT = "false";
+  private static final String ATMOSPHERE_DEFAULT_DOC = "Atmosphere configuration property";
+  static final String[] ATMOSPHERE_PARAMETERS = {
+          ApplicationConfig.WEBSOCKET_BUFFER_SIZE,
+          ApplicationConfig.WEBSOCKET_MAXTEXTSIZE,
+          ApplicationConfig.WEBSOCKET_MAXBINARYSIZE,
+          ApplicationConfig.WEBSOCKET_IDLETIME,
+          ApplicationConfig.WEBSOCKET_WRITE_TIMEOUT};
 
   static {
     config.define(ATMOSPHERE_SIMPLE_REST_PROTOCOL_DETACHED_CONFIG, Type.BOOLEAN, ATMOSPHERE_SIMPLE_REST_PROTOCOL_DETACHED_DEFAULT,
-        Importance.MEDIUM, ATMOSPHERE_SIMPLE_REST_PROTOCOL_DETACHED_DOC);
+        Importance.MEDIUM, ATMOSPHERE_SIMPLE_REST_PROTOCOL_DETACHED_DOC)
+            .define(ApplicationConfig.WEBSOCKET_BUFFER_SIZE, Type.STRING, "", Importance.MEDIUM, ATMOSPHERE_DEFAULT_DOC)
+            .define(ApplicationConfig.WEBSOCKET_MAXTEXTSIZE, Type.STRING, "", Importance.MEDIUM, ATMOSPHERE_DEFAULT_DOC)
+            .define(ApplicationConfig.WEBSOCKET_MAXBINARYSIZE, Type.STRING, "", Importance.MEDIUM, ATMOSPHERE_DEFAULT_DOC)
+            .define(ApplicationConfig.WEBSOCKET_IDLETIME, Type.STRING, "", Importance.MEDIUM, ATMOSPHERE_DEFAULT_DOC)
+            .define(ApplicationConfig.WEBSOCKET_WRITE_TIMEOUT, Type.STRING, "", Importance.MEDIUM, ATMOSPHERE_DEFAULT_DOC);
   }
   public KafkaRestAtmosphereConfig() throws RestConfigException {
     this(new Properties());
