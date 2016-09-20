@@ -29,8 +29,8 @@ can be used to start or stop the standalone kafka-rest-atmosphere server, respec
 A binary package is available from
 link:https://www.dropbox.com/sh/5qlq8rhq4gyk7wt/AABdzRI0socLxrbsJ7w-PelMa[here].
 
-  tar xzf kafka-rest-atmosphere-0.0.2-package.tgz
-  cd kafka-rest-atmosphere-0.0.2-package
+  tar xzf kafka-rest-atmosphere-0.0.3-package.tgz
+  cd kafka-rest-atmosphere-0.0.3-package
 
 === Configuration
 
@@ -185,10 +185,12 @@ For HTTP, please refer to the documentation for kafka-rest [4].
 
 == Change Logs
 
-- 0.0.3-SNAPSHOT
-     ** made the detached mode can be configured per connection (using atmosphere-2.4.6-SNAPSHOT)
-     ** support the chunked request handling (using atmosphere-2.4.6-SNAPSHOT)
-     ** support aggregation of records when the subscription mode (using kafka-rest-atmosphere-2.0.1-elakito-03-SNAPSHOT)
+- 0.0.4-SNAPSHOT
+
+- 0.0.3
+     ** made the detached mode can be configured per connection (using atmosphere-2.4.6)
+     ** support the chunked request handling (using atmosphere-2.4.6)
+     ** support aggregation of records when the subscription mode (using kafka-rest-atmosphere-2.0.1-elakito-03)
      ** made the websocket buffer size and other websocket properties configurable
 
 - 0.0.2
