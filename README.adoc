@@ -1,6 +1,6 @@
 = kafka-rest-atmosphere
 
-This is a proxy gateway based on kafka-rest[1] (2.0.1) and atmosphere[2] (2.4.4) to transparently 
+This is a proxy gateway based on kafka-rest[1] (2.0.1) and atmosphere[2] (2.4.x) to transparently 
 add a Websocket based transport to kafka-rest's HTTP REST proxy gateway. 
 As a result, the provided services of kafka-rest can be invoked over HTTP or Websocket and possibly other
 protocols supported by atmosphere. In addition, new services utilizing Websocket can also be supported
@@ -189,6 +189,7 @@ For HTTP, please refer to the documentation for kafka-rest [4].
      ** made the detached mode can be configured per connection (using atmosphere-2.4.6-SNAPSHOT)
      ** support the chunked request handling (using atmosphere-2.4.6-SNAPSHOT)
      ** support aggregation of records when the subscription mode (using kafka-rest-atmosphere-2.0.1-elakito-03-SNAPSHOT)
+     ** made the websocket buffer size and other websocket properties configurable
 
 - 0.0.2
      ** added start/stop script 
