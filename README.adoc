@@ -76,16 +76,16 @@ format using the following JSON format.
 
 --------------------------------------
    {"id": "<identifier>", "method": "<method>", "path": "<path>", 
-    "type": "<type_header>", "accept": "<accept_header>",
-    "data": <content>, "detached": <detached>, "continue": <continue>}
-   <detached_content>
+    "type": "<type_header>", "accept": "<accept_header>", "headers": <headers_map>,
+    "continue": <continue>}
+   <content>
 --------------------------------------
 
 where <identifier> represents an identifier to correlate the response to its original request,
 <method> represents the request method, <path> represents the request path, <type_header> and <accept_header>
-represent the optional content-type and accept headers, and <content> represents the optional content entity.
-The content can be detached from the JSON envelope and placed after the envelope after a newline character 
-when the optional <detached> property is set to true. Finally, the optional <continue> property may be set to true
+represent the optional content-type and accept headers, and <headers_map> represents the optional map containing additinal headers.
+The content is detached from the JSON envelope and placed after the envelope.
+Finally, the optional <continue> property may be set to true
 to indicate the message is part of a sequence. Each sequence is identified by a unique <identifier>. The continued
 messages must be reassembled at the receiving end to produce the original data stream.
 
@@ -121,8 +121,7 @@ will correspond to a JSON message of
 
 --------------------------------------
     {"id": "...", "method": "POST", "path": "/topics/test", 
-     "type": "application/vnd.kafka.binary.v1+json",
-     "data": {"records":[{"value":"S2Fma2E="}]}}
+     "type": "application/vnd.kafka.binary.v1+json"}{"records":[{"value":"S2Fma2E="}]}
 --------------------------------------
 
 For details and more samples, refer to kafka-rest-websocket-binding [3]. For available operations, 
@@ -185,7 +184,9 @@ For HTTP, please refer to the documentation for kafka-rest [4].
 
 == Change Logs
 
-- 0.0.4-SNAPSHOT
+- 0.1.0-SNAPSHOT
+     ** only use the detached mode
+     ** allow additional headers to be included using "headers" attribute.
 
 - 0.0.3
      ** made the detached mode can be configured per connection (using atmosphere-2.4.6)

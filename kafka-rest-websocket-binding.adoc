@@ -14,7 +14,7 @@ the handshake phase after the socket is open. This Websocket binding is originat
 
 REST over Websocket uses the following message format.
 
-CAUTION: The format described in this document correspond to the behavior implemented for kafka-rest-atmosphere version 0.0.2 [3]. 
+CAUTION: The format described in this document correspond to the behavior implemented for kafka-rest-atmosphere version 0.1.0-SNAPSHOT [3]. 
 
 
 [caption="Format: "]
@@ -22,10 +22,9 @@ CAUTION: The format described in this document correspond to the behavior implem
 ====
 {"id": "*_identifier_*", "method": "*_method_*", "path": "*_path_*", 
  "type": "*_type_value_*", "accept": "*_accept_value_*",
- "detached": *_detached_*,
- "data": *_content_*,
+ "headers": *_headers_map_*,
  "continue": *_continue_}
-*_detached_content_*
+*_content_*
 ====
 where
 
@@ -37,11 +36,9 @@ where
 
       - *_type_* and *_accept_* represent the optional content-type and accept header values.
 
-      - *_detached_* represents the optional boolean value which indicates the optional content is detached or embedded in the JSON envelope.
+      - *_headers_map_* represents the optional map to include additional headers.
 
-      - *_content_* represents the optional embedded content entity.
-
-      - *_detached_content_* represents the optional detached content entity.
+      - *_content_* represents the optional detached content entity.
 
       - *_continue_* represents the optional boolean value which indicates the message continues, in other words, followed by another message.
 
@@ -55,34 +52,20 @@ where
 
 .A POST request to path /foo with text content "Hello World!"
 ====
-{"id": "123", "method": "POST", "path": "/foo", "type": "text/plain", "data": "Hello World!"}
+{"id": "123", "method": "POST", "path": "/foo", "type": "text/plain"}Hello World!
 ====
 
-.A POST request to path /foo with text content "Hello World!" in the detached mode
+.A response with content "Hello World!".
 ====
-{"id": "123", "method": "POST", "path": "/foo", "type": "text/plain", "detached": true} +
-Hello World!
-====
-
-.A response with content "Hello World!"
-====
-{"id": "123", "data": "Hello World!"}
+{"id": "123"}Hello World!
 ====
 
-.A response with content "Hello World!" in the detached mode.
+.A response with large content "From a ...... to z" split in two responses.
 ====
-{"id": "123", "detached": true} +
-Hello World!
-====
-
-.A response with large content "From a ...... to z" split in two responses using the detached mode
-====
-{"id": "123", "continue": true, "detached": true} +
-From a ...
+{"id": "123", "continue": true}From a ...
 ====
 ====
-{"id": "123", "detached": true} +
-... to z
+{"id": "123"}... to z
 ====
 
 
@@ -112,7 +95,7 @@ For details about all the operations supported by kafka-rest, please refer to ka
 
 .Sample Response
 ----
-{"id": "123", "data": ["test", "jsontest"]}
+{"id": "123"}["test", "jsontest"]
 ----
 
 ==== Get the information about a specific topic
@@ -131,7 +114,7 @@ where *_topic_* is a topic name.
 
 Sample Response
 ----
-{"id": "124", "data": {"name":"test","configs":{},"partitions":[{"partition":0,"leader":0,"replicas":[{"broker":0,"leader":true,"in_sync":true}]}]}}
+{"id": "124"}{"name":"test","configs":{},"partitions":[{"partition":0,"leader":0,"replicas":[{"broker":0,"leader":true,"in_sync":true}]}]}
 ----
 
 ==== Produce and consume messages in Binary Mode
@@ -141,18 +124,18 @@ Sample Response
 [caption="Format: "]
 .produceBinary
 ====
-{"id": "*_identifier_*", "method": "POST", "path": "/topics/*_topic_*", "type": "application/vnd.kafka.binary.v1+json",  "data": {"records": [{"value": "*_base64_message_*"}]}}
+{"id": "*_identifier_*", "method": "POST", "path": "/topics/*_topic_*", "type": "application/vnd.kafka.binary.v1+json"}{"records": [{"value": "*_base64_message_*"}]}
 ====
 where *_topic_* is a topic name and *_base64_message_* is a base64 encoded string representing the content entity.
 
 .Sample Request (publishing binary message "Kafka" to topic "test")
 ----
-{"id": "125", "method": "POST", "path": "/topics/test", "type": "application/vnd.kafka.binary.v1+json",  "data": {"records": [{"value": "S2Fma2E="}]}}
+{"id": "125", "method": "POST", "path": "/topics/test", "type": "application/vnd.kafka.binary.v1+json"}{"records": [{"value": "S2Fma2E="}]}
 ----
 
 .Sample Response
 ----
-{"id": "125", "data": {"offsets":[{"partition":0,"offset":1,"error_code":null,"error":null}],"key_schema_id":null,"value_schema_id":null}}
+{"id": "125"}{"offsets":[{"partition":0,"offset":1,"error_code":null,"error":null}],"key_schema_id":null,"value_schema_id":null}
 ----
 
 ===== Consuming Messages (Binary-Mode)
@@ -162,18 +145,18 @@ where *_topic_* is a topic name and *_base64_message_* is a base64 encoded strin
 [caption="Format: "]
 .createGroup
 ====
-{"id": "*_identifier_*", "method": "POST", "path": "/consumers/*_consumer_group_*", "type": "application/vnd.kafka.binary.v1+json", "data": {"id": "*_instance_name_*", "format": "binary", "auto.offset.reset": "smallest"}}
+{"id": "*_identifier_*", "method": "POST", "path": "/consumers/*_consumer_group_*", "type": "application/vnd.kafka.binary.v1+json"}{"id": "*_instance_name_*", "format": "binary", "auto.offset.reset": "smallest"}
 ====
 where *_consumer_group_* is a consumer group name and *_instance_name_* is a consumer instance name.
 
 .Sample Request (creating binary consumer "my_instance" at consumer group "my_consumer_group")
 ----
-{"id": "126", "method": "POST", "path": "/consumers/my_consumer_group", "type": "application/vnd.kafka.binary.v1+json",  "data": {"id": "my_instance", "format": "binary", "auto.offset.reset": "smallest"}}
+{"id": "126", "method": "POST", "path": "/consumers/my_consumer_group", "type": "application/vnd.kafka.binary.v1+json"}{"id": "my_instance", "format": "binary", "auto.offset.reset": "smallest"}
 ----
 
 .Sample Response
 ----
-{"id": "126", "data": {"instance_id":"my_instance","base_uri":"http://localhost:8082/consumers/my_consumer_group/instances/my_instance"}}
+{"id": "126"}{"instance_id":"my_instance","base_uri":"http://localhost:8082/consumers/my_consumer_group/instances/my_instance"}
 ----
 
      - 2. Subscribe to the topic (Binary-Mode)
@@ -192,8 +175,8 @@ where *_consumer_group_* is a consumer group name, *_instance_name_* is a consum
 
 .Sample Response
 ----
-{"id": "127", "data": [{"key":null,"value":"SG9sYSBLYWZrYQ==","partition":0,"offset":0},{"key":null,"value":"S2Fma2E=","partition":0,"offset":1},{"key":null,"value":"S2Fma2E=","partition":0,"offset":2},{"key":null,"value":"S2Fma2E=","partition":0,"offset":3}]}
-{"id": "127", "data": {"key":null,"value":"S2Fma2E=","partition":0,"offset":4}}
+{"id": "127"}[{"key":null,"value":"SG9sYSBLYWZrYQ==","partition":0,"offset":0},{"key":null,"value":"S2Fma2E=","partition":0,"offset":1},{"key":null,"value":"S2Fma2E=","partition":0,"offset":2},{"key":null,"value":"S2Fma2E=","partition":0,"offset":3}]
+{"id": "127"}{"key":null,"value":"S2Fma2E=","partition":0,"offset":4}
 ----
 
 
@@ -233,28 +216,28 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
 [caption="Format: "]
 .produceJson
 ====
-{"id": "*_identifier_*", "method": "POST", "path": "/topics/*_topic_*", "type": "application/vnd.kafka.json.v1+json",  "data": {"records": [{"value": *_json_message_*}]}}
+{"id": "*_identifier_*", "method": "POST", "path": "/topics/*_topic_*", "type": "application/vnd.kafka.json.v1+json"}{"records": [{"value": *_json_message_*}]}
 ====
 where *_topic_* is a topic name and *_json_message_* is a json encoded string representing the content entity.
 
 .Sample Request (publishing json message {"greeting": "hey"} to topic "jsontest")
 ----
-{"id": "125", "method": "POST", "path": "/topics/jsontest", "type": "application/vnd.kafka.json.v1+json", "data": {"records": [{"value": {"greeting": "hey"}}]}}
+{"id": "125", "method": "POST", "path": "/topics/jsontest", "type": "application/vnd.kafka.json.v1+json"}{"records": [{"value": {"greeting": "hey"}}]}
 ----
 
 .Sample Response
 ----
-{"id": "125", "data": {"offsets":[{"partition":0,"offset":11,"error_code":null,"error":null}],"key_schema_id":null,"value_schema_id":null}}
+{"id": "125"}{"offsets":[{"partition":0,"offset":11,"error_code":null,"error":null}],"key_schema_id":null,"value_schema_id":null}
 ----
 
 .Sample Request (publishing json messages "foo" and {"greeting": "bye"} to topic "jsontest")
 ----
-{"id": "126", "method": "POST", "path": "/topics/jsontest", "type": "application/vnd.kafka.json.v1+json",  "data": {"records": [{"value": "foo"}, {"value": {"greeting": "bye"}}]}}
+{"id": "126", "method": "POST", "path": "/topics/jsontest", "type": "application/vnd.kafka.json.v1+json"}{"records": [{"value": "foo"}, {"value": {"greeting": "bye"}}]}
 ----
 
 .Sample Response
 ----
- {"id": "126", "data": {"offsets":[{"partition":0,"offset":12,"error_code":null,"error":null},{"partition":0,"offset":13,"error_code":null,"error":null}],"key_schema_id":null,"value_schema_id":null}}
+ {"id": "126"}{"offsets":[{"partition":0,"offset":12,"error_code":null,"error":null},{"partition":0,"offset":13,"error_code":null,"error":null}],"key_schema_id":null,"value_schema_id":null}
 ----
 
 
@@ -266,18 +249,18 @@ where *_topic_* is a topic name and *_json_message_* is a json encoded string re
 [caption="Format: "]
 .createGroup
 ====
-{"id": "*_identifier_*", "method": "POST", "path": "/consumers/*_consumer_group_*", "type": "application/vnd.kafka.json.v1+json",  "data": {"id": "*_instance_name_*", "format": "json", "auto.offset.reset": "smallest"}}
+{"id": "*_identifier_*", "method": "POST", "path": "/consumers/*_consumer_group_*", "type": "application/vnd.kafka.json.v1+json"}{"id": "*_instance_name_*", "format": "json", "auto.offset.reset": "smallest"}
 ====
 where *_consumer_group_* is a consumer group name and *_instance_name_* is a consumer instance name.
 
 .Sample Request (creating json consumer "my_json_instance" at consumer group "my_json_consumer_group")
 ----
-{"id": "126", "method": "POST", "path": "/consumers/my_json_consumer_group", "type": "application/vnd.kafka.json.v1+json",  "data": {"id": "my_json_instance", "format": "json", "auto.offset.reset": "smallest"}}
+{"id": "126", "method": "POST", "path": "/consumers/my_json_consumer_group", "type": "application/vnd.kafka.json.v1+json"}{"id": "my_json_instance", "format": "json", "auto.offset.reset": "smallest"}
 ----
 
 .Sample Response
 ----
- {"id": "126", "data": {"instance_id":"my_json_instance","base_uri":"http://localhost:8082/consumers/my_json_consumer_group/instances/my_json_instance"}}
+ {"id": "126"}{"instance_id":"my_json_instance","base_uri":"http://localhost:8082/consumers/my_json_consumer_group/instances/my_json_instance"}
 ----
 
      - 2. Subscribe to the topic (JSON-Mode)
@@ -296,8 +279,8 @@ where *_consumer_group_* is a consumer group name, *_instance_name_* is a consum
 
 .sample Response
 ----
-{"id": "127", "data": [{"key":null,"value":{"greeting":"hey"},"partition":0,"offset":1},{"key":null,"value":{"greeting":"hey"},"partition":0,"offset":2},{"key":null,"value":{"greeting":"bye"},"partition":0,"offset":3}]}
-{"id": "127", "data": {"key":null,"value":{"greeting":"bye"},"partition":0,"offset":4}}
+{"id": "127"}[{"key":null,"value":{"greeting":"hey"},"partition":0,"offset":1},{"key":null,"value":{"greeting":"hey"},"partition":0,"offset":2},{"key":null,"value":{"greeting":"bye"},"partition":0,"offset":3}]
+{"id": "127"}{"key":null,"value":{"greeting":"bye"},"partition":0,"offset":4}
 ----
 
      - 3. Unsubscribe from the topic
@@ -345,7 +328,7 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
 
 .sample Response
 ----
-{"id": "127", "data": [{"partition":0,"leader":0,"replicas":[{"broker":0,"leader":true,"in_sync":true}]}]}
+{"id": "127"}[{"partition":0,"leader":0,"replicas":[{"broker":0,"leader":true,"in_sync":true}]}]
 ----
 
 [caption="Format: "]
@@ -362,7 +345,7 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
 
 .sample Response
 ----
-{"id": "128", "data": {"partition":0,"leader":0,"replicas":[{"broker":0,"leader":true,"in_sync":true}]}}
+{"id": "128"}{"partition":0,"leader":0,"replicas":[{"broker":0,"leader":true,"in_sync":true}]}
 ----
 
 ==== Consume messages from a specific partition (Binary Mode)
@@ -383,7 +366,7 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
 
 .Sample Response
 ----
-{"id": "130", "data": [{"key":null,"value":"S2Fma2E=","partition":0,"offset":45}]}
+{"id": "130"}[{"key":null,"value":"S2Fma2E=","partition":0,"offset":45}]
 ----
 
 ==== Consume messages from a specific partition (JSON Mode)
@@ -404,7 +387,7 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
 
 .Sample Response
 ----
-{"id": "130", "data": [{"key":null,"value":{"greeting":"hey"},"partition":0,"offset":45}]}
+{"id": "130"}[{"key":null,"value":{"greeting":"hey"},"partition":0,"offset":45}]
 ----
 
 
@@ -424,7 +407,7 @@ where *_consumer_group_* is a consumer group name and *_instance_name_* is a con
 
 .Sample Response
 ----
-{"id": "129", "data": [{"topic":"test","partition":0,"consumed":45,"committed":45}]}
+{"id": "129"}[{"topic":"test","partition":0,"consumed":45,"committed":45}]}
 ----
 
 ==== References
