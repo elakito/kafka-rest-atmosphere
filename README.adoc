@@ -77,8 +77,7 @@ format using the following JSON format.
 --------------------------------------
    {"id": "<identifier>", "method": "<method>", "path": "<path>", 
     "type": "<type_header>", "accept": "<accept_header>", "headers": <headers_map>,
-    "continue": <continue>}
-   <content>
+    "continue": <continue>}<content>
 --------------------------------------
 
 where <identifier> represents an identifier to correlate the response to its original request,
@@ -187,6 +186,8 @@ For HTTP, please refer to the documentation for kafka-rest [4].
 - 0.1.0-SNAPSHOT
      ** only use the detached mode
      ** allow additional headers to be included using "headers" attribute.
+     ** upgrade atmosphere to 2.4.26
+     ** upgrade atmosphere-client to 2.3.5
 
 - 0.0.3
      ** made the detached mode can be configured per connection (using atmosphere-2.4.6)
